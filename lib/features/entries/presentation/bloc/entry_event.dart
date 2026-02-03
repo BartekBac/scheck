@@ -4,6 +4,9 @@ abstract class EntryEvent {}
 
 class LoadEntries extends EntryEvent {}
 
+class EntriesSubscriptionRequested extends EntryEvent {}
+
+/*
 class AddEntryEvent extends EntryEvent {
   final Entry entry;
 
@@ -14,4 +17,4 @@ class DeleteEntryEvent extends EntryEvent {
   final String id;
 
   DeleteEntryEvent(this.id);
-}
+}*/

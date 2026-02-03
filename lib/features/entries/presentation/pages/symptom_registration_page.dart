@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
-import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
 import 'package:scheck/features/entries/presentation/widgets/symptom_registration_form.dart';
 import 'package:scheck/injection.dart';
 
@@ -12,17 +11,9 @@ class SymptomRegistrationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register Symptoms'),
-        elevation: 0,
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-      ),
-      body: BlocProvider(
-        create: (context) => getIt<SymptomRegistrationBloc>(),
-        child: const SymptomRegistrationForm(),
-      ),
+    return BlocProvider(
+      create: (context) => getIt<SymptomRegistrationBloc>(),
+      child: const SymptomRegistrationForm(),
     );
   }
 }

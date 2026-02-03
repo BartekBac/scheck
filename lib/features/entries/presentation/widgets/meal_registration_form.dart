@@ -1,7 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/features/entries/presentation/pages/meal_registration_page.dart';
+import 'package:scheck/features/navigation/presentation/bloc/navigation_bloc.dart';
 
 class MealRegistrationForm extends StatelessWidget {
   const MealRegistrationForm({super.key});
@@ -34,7 +39,8 @@ class MealRegistrationForm extends StatelessWidget {
   }
 
   Widget _buildImageSection(BuildContext context) {
-    final state = context.read<MealRegistrationBloc>().state;
+    final bloc = context.read<MealRegistrationBloc>();
+    final state = bloc.state;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,8 +51,83 @@ class MealRegistrationForm extends StatelessWidget {
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () {
-            // TODO: Open camera
-            context.read<MealRegistrationBloc>().add(SelectImage('placeholder_url'));
+            showModalBottomSheet(
+              context: context,
+              builder: (bottomSheetContext) => SafeArea(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height / 5,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                final picker = ImagePicker();
+                                final image = await picker.pickImage(source: ImageSource.camera);
+                                if (image != null) {
+                                  bloc.add(SelectImage(image.path));
+                                  if (bottomSheetContext.mounted) {
+                                    Navigator.pop(bottomSheetContext);
+                                  }
+                                }
+                              } catch (e) {
+                                log(e.toString(), error: e);
+                                if (bottomSheetContext.mounted) {
+                                  Navigator.pop(bottomSheetContext);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text('Camera not available. Use gallery instead.'),
+                                      backgroundColor: Colors.orange,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text('Camera'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                final picker = ImagePicker();
+                                final image = await picker.pickImage(source: ImageSource.gallery);
+                                if (image != null) {
+                                  bloc.add(SelectImage(image.path));
+                                  if (bottomSheetContext.mounted) {
+                                    Navigator.pop(bottomSheetContext);
+                                  }
+                                }
+                              } catch (e) {
+                                log(e.toString(), error: e);
+                                if (bottomSheetContext.mounted) {
+                                  Navigator.pop(bottomSheetContext);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text('Gallery not available.'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text('Gallery'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () => Navigator.pop(bottomSheetContext),
+                        child: const Text('Cancel'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
           },
           child: Container(
             height: 200,
@@ -66,8 +147,8 @@ class MealRegistrationForm extends StatelessWidget {
                   )
                 : ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      state.imageUrl,
+                    child: Image.file(
+                      File(state.imageUrl),
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: 200,
@@ -94,7 +175,7 @@ class MealRegistrationForm extends StatelessWidget {
           runSpacing: 8,
           children: MealType.values.map((type) {
             return ChoiceChip(
-              label: Text(_getMealTypeLabel(type)),
+              label: Text(type.label),
               selected: state.mealType == type,
               onSelected: (selected) {
                 if (selected) {
@@ -190,7 +271,7 @@ class MealRegistrationForm extends StatelessWidget {
                   color: state.moodBeforeMeal == mood ? Colors.orange : Colors.grey[100],
                 ),
                 child: Icon(
-                  _getMoodIcon(mood),
+                  mood.icon,
                   color: state.moodBeforeMeal == mood ? Colors.white : Colors.black,
                 ),
               ),
@@ -228,11 +309,10 @@ class MealRegistrationForm extends StatelessWidget {
 
   Widget _buildSubmitButton(BuildContext context, MealRegistrationState state) {
     return ElevatedButton(
-      onPressed: state.status == MealRegistrationStatus.imageSelected
-          ? () {
-              context.read<MealRegistrationBloc>().add(SubmitMeal());
-            }
-          : null,
+      onPressed: () {
+        context.read<MealRegistrationBloc>().add(SubmitMeal());
+        context.read<NavigationBloc>().add(NavigationEvent.pageChanged(0));
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
@@ -248,33 +328,4 @@ class MealRegistrationForm extends StatelessWidget {
     );
   }
 
-  String _getMealTypeLabel(MealType type) {
-    switch (type) {
-      case MealType.breakfast:
-        return 'Breakfast';
-      case MealType.lunch:
-        return 'Lunch';
-      case MealType.dinner:
-        return 'Dinner';
-      case MealType.snack:
-        return 'Snack';
-      case MealType.other:
-        return 'Other';
-    }
-  }
-
-  IconData _getMoodIcon(Mood mood) {
-    switch (mood) {
-      case Mood.great:
-        return Icons.sentiment_very_satisfied;
-      case Mood.good:
-        return Icons.sentiment_satisfied;
-      case Mood.neutral:
-        return Icons.sentiment_neutral;
-      case Mood.bad:
-        return Icons.sentiment_dissatisfied;
-      case Mood.terrible:
-        return Icons.sentiment_very_dissatisfied;
-    }
-  }
 }
