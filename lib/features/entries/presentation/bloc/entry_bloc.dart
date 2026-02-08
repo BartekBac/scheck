@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
+import 'package:scheck/features/entries/domain/usecases/delete_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/get_entries.dart';
 import 'package:scheck/features/entries/domain/usecases/watch_entries.dart';
 
@@ -13,17 +15,19 @@ part 'entry_bloc.freezed.dart';
 @injectable
 class EntryBloc extends Bloc<EntryEvent, EntryState> {
   final GetEntries getEntries;
-  //final AddEntry addEntry;
+  final AddEntry addEntry;
+  final DeleteEntry deleteEntry;
   final WatchEntries watchEntries;
 
   EntryBloc({
     required this.getEntries,
-    //required this.addEntry,
+    required this.addEntry,
+    required this.deleteEntry,
     required this.watchEntries,
   }) : super(EntryInitial()) {
     on<LoadEntries>(_onLoadEntries);
-    /*on<AddEntryEvent>(_onAddEntry);
-    on<DeleteEntryEvent>(_onDeleteEntry);*/
+    on<AddEntryEvent>(_onAddEntry);
+    on<DeleteEntryEvent>(_onDeleteEntry);
     on<EntriesSubscriptionRequested>(_onSubscriptionRequested);
   }
 
@@ -49,11 +53,10 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
     }
   }
 
-  /*
+
   Future<void> _onAddEntry(AddEntryEvent event, Emitter<EntryState> emit) async {
     try {
-      await addEntry(event.entry);
-      add(LoadEntries());
+      await addEntry.call(event.entry);
     } catch (e) {
       emit(EntryError('Failed to add entry: $e'));
     }
@@ -61,11 +64,10 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
 
   Future<void> _onDeleteEntry(DeleteEntryEvent event, Emitter<EntryState> emit) async {
     try {
-      await Future.delayed(Duration.zero); // TODO: Implement delete
-      add(LoadEntries());
+      await deleteEntry.call(event.entry);
     } catch (e) {
       emit(EntryError('Failed to delete entry: $e'));
     }
   }
-  */
+
 }

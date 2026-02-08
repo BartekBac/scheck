@@ -1,35 +1,166 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/utils/dialog_handler.dart';
+import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
 
-class EntryCard extends StatelessWidget {
+class EntryCard extends StatefulWidget {
   final Entry entry;
 
-  const EntryCard({super.key, required this.entry});
+  EntryCard({super.key, required this.entry});
+
+  @override
+  State<EntryCard> createState() => _EntryCardState();
+}
+
+class _EntryCardState extends State<EntryCard> {
+  bool _showBottomMenu = false;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            const SizedBox(height: 12),
-            if (entry is MealEntry) _buildMealDetails(entry as MealEntry),
-            if (entry is SymptomEntry) _buildSymptomDetails(entry as SymptomEntry),
-            if (entry.description != null) ...[
-              const SizedBox(height: 12),
-              _buildDescription(),
-            ],
+            GestureDetector(
+              onTap: () => setState(() {
+                _showBottomMenu = !_showBottomMenu;
+              }),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 12),
+                    if (widget.entry is MealEntry) _buildMealDetails(widget.entry as MealEntry),
+                    if (widget.entry is SymptomEntry) _buildSymptomDetails(widget.entry as SymptomEntry),
+                    if (widget.entry.description != null) ...[
+                      const SizedBox(height: 12),
+                      _buildDescription(),
+                    ],
+
+                  ],
+                ),
+              ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: Visibility(
+                visible: _showBottomMenu,
+                child: _buildBottomMenu(context),
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBottomMenu(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 40,
+            decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)), color: Colors.amber),
+            child: Row(children: [
+              Expanded(child: InkWell(
+                onTap: () => _showEntryDetailsDialog(context, widget.entry),
+                child: ColoredBox(color: Colors.grey,  child: Center(child: Text('Info')))
+              )),
+              Expanded(child: InkWell(
+                onTap: () => DialogHandler.showConfirmDialog(context, 'Are you sure you want to delete this entry?')
+                    .then((confirmed) => confirmed ? context.read<EntryBloc>().add(DeleteEntryEvent(widget.entry)) : null),
+                child: ColoredBox(color:Colors.red, child: Center(child: Text('Delete')))
+              )) //TODO start using ColorStyler and IconStyler
+            ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  void _showEntryDetailsDialog(BuildContext context, Entry entry) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(entry.timestamp.toString().substring(0, 16)),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(children: [Text('Id: ${entry.id}')]),
+            if (entry is SymptomEntry)...[
+              Row(
+                children: [
+                  Text(
+                    'Symptoms: ${entry.symptoms.join(", ")}',
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Intensities: ${entry.symptomIntensities.toString()}')
+                ],
+              )
+            ],
+            if (entry is MealEntry)
+              ...[
+                Row(children: [
+                  Text('Meal: ${entry.mealType.name}'),
+                ]),
+                Row(children: [
+                  Flexible(
+                    child: Text('Image: ${entry.imageUrl}'),
+                  ),
+                ]),
+                Row(children: [
+                  Text('Mood: '),
+                  Icon(
+                    entry.moodBeforeMeal?.icon ?? Icons.do_not_disturb_sharp,
+                    size: 20,
+                  ),
+                  Text(
+                      entry.moodBeforeMeal?.name ?? 'N/A'
+                  ),
+                ],),
+                Row(children: [
+                  Text('Ingredients: ${entry.ingredients.join(", ")}'),
+                ],),
+              ],
+            if (entry.description != null)
+              Text('Description: ${entry.description}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+          TextButton(
+            child: const Text('Delete'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            onPressed: () async {
+              context.read<EntryBloc>().add(DeleteEntryEvent(entry));
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+        ],
       ),
     );
   }
@@ -37,7 +168,7 @@ class EntryCard extends StatelessWidget {
   Widget _buildHeader() {
     final timeFormat = DateFormat('HH:mm');
     final dateFormat = DateFormat('yyyy-MM-dd');
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -45,14 +176,14 @@ class EntryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              timeFormat.format(entry.timestamp),
+              timeFormat.format(widget.entry.timestamp),
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              dateFormat.format(entry.timestamp),
+              dateFormat.format(widget.entry.timestamp),
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
@@ -66,7 +197,7 @@ class EntryCard extends StatelessWidget {
   }
 
   Widget _buildEntryTypeIcon() {
-    if (entry is MealEntry) {
+    if (widget.entry is MealEntry) {
       return Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -95,11 +226,35 @@ class EntryCard extends StatelessWidget {
     }
   }
 
+  Widget _buildMealImage(MealEntry mealEntry) {
+    if (widget.entry is MealEntry) {
+      final imageUrl = Uri.parse(mealEntry.imageUrl);
+      if (imageUrl.isScheme('http') || imageUrl.isScheme('https')) {
+        return Image.network(
+          mealEntry.imageUrl,
+          width: double.infinity,
+          height: 100,
+          fit: BoxFit.cover,
+        );
+      } else {
+        return Image.file(
+          File(mealEntry.imageUrl),
+          width: double.infinity,
+          height: 100,
+          fit: BoxFit.cover,
+        );
+      }
+    } else {
+      return const SizedBox();
+    }
+  }
+
   Widget _buildMealDetails(MealEntry mealEntry) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildInfoRow('Meal Type', _getMealTypeLabel(mealEntry.mealType)),
+        _buildMealImage(mealEntry),
         if (mealEntry.ingredients.isNotEmpty) ...[
           const SizedBox(height: 8),
           _buildInfoRow('Ingredients', mealEntry.ingredients.join(', ')),
@@ -189,7 +344,7 @@ class EntryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(entry.description!),
+          Text(widget.entry.description!),
         ],
       ),
     );

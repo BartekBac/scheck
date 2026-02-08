@@ -24,7 +24,7 @@ class MealRegistrationForm extends StatelessWidget {
               const SizedBox(height: 24),
               _buildMealTypeSelector(context),
               const SizedBox(height: 24),
-              _buildIngredientsSection(context),
+              const _IngredientsSection(),
               const SizedBox(height: 24),
               _buildMoodSection(context),
               const SizedBox(height: 24),
@@ -194,53 +194,78 @@ class MealRegistrationForm extends StatelessWidget {
     );
   }
 
-  Widget _buildIngredientsSection(BuildContext context) {
-    final state = context.read<MealRegistrationBloc>().state;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Ingredients',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          decoration: InputDecoration(
-            hintText: 'Enter ingredients separated by commas',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                // TODO: Add ingredients
-              },
-            ),
-          ),
-          onChanged: (value) {
-            final ingredients = value.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-            context.read<MealRegistrationBloc>().add(UpdateIngredients(ingredients));
+/*  Widget _buildIngredientsSection(BuildContext context) {
+    return BlocBuilder<MealRegistrationBloc, MealRegistrationState>(
+      buildWhen: (previous, current) => previous.ingredients != current.ingredients,
+      builder: (context, state) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final controller = TextEditingController(text: state.ingredientsText);
+            //final ingredientsText = state.ingredients.join(', ');
+            //controller.text = 'test';//ingredientsText;
+
+            /*controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: controller.text.length),
+            );
+*/
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Ingredients',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    hintText: 'Enter ingredients separated by commas',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    final endsWithCommaAndWhitespace = RegExp(r',\s*$');
+                    if(!endsWithCommaAndWhitespace.hasMatch(value,)) {
+                      final ingredients = value
+                          .split(',')
+                          .map((e) => e.trim())
+                          .where((e) => e.isNotEmpty)
+                          .toList();
+                      context.read<MealRegistrationBloc>().add(
+                          UpdateIngredients(ingredients));
+                    }
+                  },
+                ),
+                if (state.ingredients.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: state.ingredients.map((ingredient) {
+                        return Chip(
+                          label: Text(ingredient),
+                          backgroundColor: Colors.orange[100],
+                          deleteIcon: const Icon(Icons.close, size: 18),
+                          onDeleted: () {
+                            final updatedIngredients = List<String>.from(state.ingredients)..remove(ingredient);
+                            context.read<MealRegistrationBloc>().add(UpdateIngredients(updatedIngredients));
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ],
+            );
           },
-        ),
-        if (state.ingredients.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 4,
-            runSpacing: 4,
-            children: state.ingredients.map((ingredient) => Chip(
-              label: Text(ingredient),
-              backgroundColor: Colors.orange[100],
-              deleteIcon: const Icon(Icons.close, size: 16),
-              onDeleted: () {
-                final updated = List<String>.from(state.ingredients)..remove(ingredient);
-                context.read<MealRegistrationBloc>().add(UpdateIngredients(updated));
-              },
-            )).toList(),
-          ),
-        ],
-      ],
+        );
+      },
     );
   }
+*/
 
   Widget _buildMoodSection(BuildContext context) {
     final state = context.read<MealRegistrationBloc>().state;
@@ -328,4 +353,97 @@ class MealRegistrationForm extends StatelessWidget {
     );
   }
 
+}
+
+class _IngredientsSection extends StatefulWidget {
+  const _IngredientsSection();
+
+  @override
+  State<_IngredientsSection> createState() => _IngredientsSectionState();
+}
+
+class _IngredientsSectionState extends State<_IngredientsSection> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MealRegistrationBloc>();
+    _controller.text = bloc.state.ingredients.join(', ');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<MealRegistrationBloc, MealRegistrationState>(
+      listenWhen: (previous, current) => previous.ingredients != current.ingredients,
+      listener: (context, state) {
+        final newText = state.ingredientsText;
+        if (newText != _controller.text) {
+          _controller.text = newText;
+          _controller.selection = TextSelection.fromPosition(
+            TextPosition(offset: _controller.text.length),
+          );
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Ingredients',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+              hintText: 'Enter ingredients separated by commas',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onChanged: (value) {
+              final endsWithCommaAndWhitespace = RegExp(r',\s*$');
+              final endsWithSpace = RegExp(r'\s$');
+              if (!(endsWithCommaAndWhitespace.hasMatch(value) || endsWithSpace.hasMatch(value))) {
+                final ingredients = value.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+                context.read<MealRegistrationBloc>().add(UpdateIngredients(ingredients));
+              }
+            },
+          ),
+          BlocBuilder<MealRegistrationBloc, MealRegistrationState>(
+            buildWhen: (p, c) => p.ingredients != c.ingredients,
+            builder: (context, state) {
+              if (state.ingredients.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: state.ingredients.map((ingredient) {
+                    return Chip(
+                      label: Text(ingredient),
+                      backgroundColor: Colors.orange[100],
+                      deleteIcon: const Icon(Icons.close, size: 18),
+                      onDeleted: () {
+                        final updatedIngredients = List<String>.from(state.ingredients)..remove(ingredient);
+                        context.read<MealRegistrationBloc>().add(UpdateIngredients(updatedIngredients));
+                      },
+                    );
+                  }).toList(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -6,7 +6,7 @@ class LoadEntries extends EntryEvent {}
 
 class EntriesSubscriptionRequested extends EntryEvent {}
 
-/*
+
 class AddEntryEvent extends EntryEvent {
   final Entry entry;
 
@@ -14,7 +14,7 @@ class AddEntryEvent extends EntryEvent {
 }
 
 class DeleteEntryEvent extends EntryEvent {
-  final String id;
+  final Entry entry;
 
-  DeleteEntryEvent(this.id);
-}*/
+  DeleteEntryEvent(this.entry);
+}

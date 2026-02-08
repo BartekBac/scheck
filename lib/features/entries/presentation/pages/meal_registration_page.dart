@@ -81,10 +81,8 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
 
       await addEntry.call(entry);
 
-      emit(state.copyWith(
-        status: MealRegistrationStatus.submitted,
-        entry: entry,
-      ));
+      // reset state
+      emit(const MealRegistrationState());
     } catch (e) {
       emit(state.copyWith(error: 'Failed to submit meal: $e'));
     }
@@ -138,6 +136,7 @@ class MealRegistrationState {
   final MealRegistrationStatus status;
 
   bool get readyToSave => imageUrl.isNotEmpty;
+  String get ingredientsText => ingredients.join(', ');
 
   const MealRegistrationState({
     this.imageUrl = '',

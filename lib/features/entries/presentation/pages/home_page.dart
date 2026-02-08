@@ -36,65 +36,7 @@ class HomeContent extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(entry.timestamp.toString().substring(0, 16)),
-                        content: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(children: [Text('Id: ${entry.id}')]),
-                            if (entry is SymptomEntry)...[
-                              Row(
-                                children: [
-                                  Text(
-                                    'Symptoms: ${entry.symptoms.join(", ")}',
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text('Intensities: ${entry.symptomIntensities.toString()}')
-                                ],
-                              )
-                            ],
-                            if (entry is MealEntry)
-                              ...[
-                                Row(children: [
-                                  Text('Meal: ${entry.mealType.name}'),
-                                ]),
-                                Row(children: [
-                                  Text('Image: ${entry.imageUrl}')
-                                ]),
-                                Row(children: [
-                                  Text('Mood: '),
-                                  Icon(
-                                    entry.moodBeforeMeal?.icon ?? Icons.do_not_disturb_sharp,
-                                    size: 20,
-                                  ),
-                                  Text(
-                                    entry.moodBeforeMeal?.name ?? 'N/A'
-                                  ),
-                                ],),
-                                Row(children: [
-                                  Text('Ingredients: ${entry.ingredients.join(", ")}'),
-                                ],),
-                              ],
-                            if (entry.description != null)
-                              Text('Description: ${entry.description}'),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            child: const Text('Close'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      ),
-                    );
+                    _showEntryDetailsDialog(context, entry);
                   },
                 ),
               );
@@ -103,6 +45,80 @@ class HomeContent extends StatelessWidget {
         }
         return const SizedBox.shrink();
       },
+    );
+  }
+
+  void _showEntryDetailsDialog(BuildContext context, Entry entry) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(entry.timestamp.toString().substring(0, 16)),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(children: [Text('Id: ${entry.id}')]),
+            if (entry is SymptomEntry)...[
+              Row(
+                children: [
+                  Text(
+                    'Symptoms: ${entry.symptoms.join(", ")}',
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Intensities: ${entry.symptomIntensities.toString()}')
+                ],
+              )
+            ],
+            if (entry is MealEntry)
+              ...[
+                Row(children: [
+                  Text('Meal: ${entry.mealType.name}'),
+                ]),
+                Row(children: [
+                  Flexible(
+                    child: Text('Image: ${entry.imageUrl}'),
+                  ),
+                ]),
+                Row(children: [
+                  Text('Mood: '),
+                  Icon(
+                    entry.moodBeforeMeal?.icon ?? Icons.do_not_disturb_sharp,
+                    size: 20,
+                  ),
+                  Text(
+                    entry.moodBeforeMeal?.name ?? 'N/A'
+                  ),
+                ],),
+                Row(children: [
+                  Text('Ingredients: ${entry.ingredients.join(", ")}'),
+                ],),
+              ],
+            if (entry.description != null)
+              Text('Description: ${entry.description}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+          TextButton(
+            child: const Text('Delete'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            onPressed: () async {
+              context.read<EntryBloc>().add(DeleteEntryEvent(entry));
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+        ],
+      ),
     );
   }
 }
