@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scheck/features/entries/presentation/pages/symptom_registration_page.dart';
+import 'package:scheck/features/navigation/presentation/bloc/navigation_bloc.dart';
 
 class SymptomRegistrationForm extends StatelessWidget {
   const SymptomRegistrationForm({super.key});
@@ -175,9 +176,10 @@ class SymptomRegistrationForm extends StatelessWidget {
 
   Widget _buildSubmitButton(BuildContext context, SymptomRegistrationState state) {
     return ElevatedButton(
-      onPressed: state.selectedSymptoms.isNotEmpty
+      onPressed: state.readyToSave
           ? () {
               context.read<SymptomRegistrationBloc>().add(SubmitSymptoms());
+              context.read<NavigationBloc>().add(const NavigationEvent.pageChanged(0));
             }
           : null,
       style: ElevatedButton.styleFrom(

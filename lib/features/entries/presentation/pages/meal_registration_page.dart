@@ -63,9 +63,10 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
   Future<void> _onUpdateDescription(UpdateDescription event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(
       description: event.description,
+      status: MealRegistrationStatus.editing,
     ));
   }
-  //TODO: here AddEntry usecase should be used and EntryBloc should listen to repo streams of saving data via FormBlocs
+
   Future<void> _onSubmitMeal(SubmitMeal event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(status: MealRegistrationStatus.submitting));
     try {
@@ -80,7 +81,6 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       );
 
       await addEntry.call(entry);
-
       // reset state
       emit(const MealRegistrationState());
     } catch (e) {
@@ -176,6 +176,5 @@ enum MealRegistrationStatus {
   initial,
   editing,
   submitting,
-  submitted,
   error,
 }

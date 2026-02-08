@@ -28,7 +28,7 @@ class MealRegistrationForm extends StatelessWidget {
               const SizedBox(height: 24),
               _buildMoodSection(context),
               const SizedBox(height: 24),
-              _buildDescriptionSection(context),
+              const _DescriptionSection(),
               const SizedBox(height: 32),
               _buildSubmitButton(context, state),
             ],
@@ -194,79 +194,6 @@ class MealRegistrationForm extends StatelessWidget {
     );
   }
 
-/*  Widget _buildIngredientsSection(BuildContext context) {
-    return BlocBuilder<MealRegistrationBloc, MealRegistrationState>(
-      buildWhen: (previous, current) => previous.ingredients != current.ingredients,
-      builder: (context, state) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final controller = TextEditingController(text: state.ingredientsText);
-            //final ingredientsText = state.ingredients.join(', ');
-            //controller.text = 'test';//ingredientsText;
-
-            /*controller.selection = TextSelection.fromPosition(
-              TextPosition(offset: controller.text.length),
-            );
-*/
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Ingredients',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    hintText: 'Enter ingredients separated by commas',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    final endsWithCommaAndWhitespace = RegExp(r',\s*$');
-                    if(!endsWithCommaAndWhitespace.hasMatch(value,)) {
-                      final ingredients = value
-                          .split(',')
-                          .map((e) => e.trim())
-                          .where((e) => e.isNotEmpty)
-                          .toList();
-                      context.read<MealRegistrationBloc>().add(
-                          UpdateIngredients(ingredients));
-                    }
-                  },
-                ),
-                if (state.ingredients.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: state.ingredients.map((ingredient) {
-                        return Chip(
-                          label: Text(ingredient),
-                          backgroundColor: Colors.orange[100],
-                          deleteIcon: const Icon(Icons.close, size: 18),
-                          onDeleted: () {
-                            final updatedIngredients = List<String>.from(state.ingredients)..remove(ingredient);
-                            context.read<MealRegistrationBloc>().add(UpdateIngredients(updatedIngredients));
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-*/
-
   Widget _buildMoodSection(BuildContext context) {
     final state = context.read<MealRegistrationBloc>().state;
     return Column(
@@ -307,37 +234,14 @@ class MealRegistrationForm extends StatelessWidget {
     );
   }
 
-  Widget _buildDescriptionSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Description (Optional)',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: 'Add any additional notes...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          onChanged: (value) {
-            context.read<MealRegistrationBloc>().add(UpdateDescription(value.isEmpty ? null : value));
-          },
-        ),
-      ],
-    );
-  }
-
   Widget _buildSubmitButton(BuildContext context, MealRegistrationState state) {
     return ElevatedButton(
-      onPressed: () {
-        context.read<MealRegistrationBloc>().add(SubmitMeal());
-        context.read<NavigationBloc>().add(NavigationEvent.pageChanged(0));
-      },
+      onPressed: state.readyToSave
+          ? () {
+              context.read<MealRegistrationBloc>().add(SubmitMeal());
+              context.read<NavigationBloc>().add(const NavigationEvent.pageChanged(0));
+            }
+          : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
@@ -352,7 +256,6 @@ class MealRegistrationForm extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _IngredientsSection extends StatefulWidget {
@@ -440,6 +343,68 @@ class _IngredientsSectionState extends State<_IngredientsSection> {
                   }).toList(),
                 ),
               );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DescriptionSection extends StatefulWidget {
+  const _DescriptionSection();
+
+  @override
+  State<_DescriptionSection> createState() => _DescriptionSectionState();
+}
+
+class _DescriptionSectionState extends State<_DescriptionSection> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = context.read<MealRegistrationBloc>().state.description ?? '';
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<MealRegistrationBloc, MealRegistrationState>(
+      listenWhen: (previous, current) => previous.description != current.description,
+      listener: (context, state) {
+        final newText = state.description ?? '';
+        if (newText != _controller.text) {
+          _controller.text = newText;
+          _controller.selection = TextSelection.fromPosition(
+            TextPosition(offset: _controller.text.length),
+          );
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Description (Optional)',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _controller,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Add any additional notes...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onChanged: (value) {
+              context.read<MealRegistrationBloc>().add(UpdateDescription(value.isEmpty ? null : value));
             },
           ),
         ],
