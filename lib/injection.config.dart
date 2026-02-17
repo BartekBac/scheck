@@ -27,8 +27,12 @@ import 'package:scheck/features/entries/domain/repositories/entry_repository.dar
     as _i59;
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart'
     as _i292;
+import 'package:scheck/features/entries/domain/usecases/delete_entry.dart'
+    as _i1066;
 import 'package:scheck/features/entries/domain/usecases/get_entries.dart'
     as _i955;
+import 'package:scheck/features/entries/domain/usecases/watch_entries.dart'
+    as _i891;
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart'
     as _i988;
 import 'package:scheck/features/entries/presentation/pages/meal_registration_page.dart'
@@ -59,6 +63,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i292.AddEntry>(
       () => _i292.AddEntry(gh<_i59.EntryRepository>()),
     );
+    gh.factory<_i1066.DeleteEntry>(
+      () => _i1066.DeleteEntry(gh<_i59.EntryRepository>()),
+    );
+    gh.factory<_i891.WatchEntries>(
+      () => _i891.WatchEntries(gh<_i59.EntryRepository>()),
+    );
     gh.factory<_i955.GetEntries>(
       () => _i955.GetEntries(gh<_i59.EntryRepository>()),
     );
@@ -66,6 +76,8 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i988.EntryBloc(
         getEntries: gh<_i955.GetEntries>(),
         addEntry: gh<_i292.AddEntry>(),
+        deleteEntry: gh<_i1066.DeleteEntry>(),
+        watchEntries: gh<_i891.WatchEntries>(),
       ),
     );
     gh.factory<_i671.MealRegistrationBloc>(

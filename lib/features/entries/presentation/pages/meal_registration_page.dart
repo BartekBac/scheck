@@ -11,20 +11,9 @@ class MealRegistrationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register Meal'),
-        elevation: 0,
-        backgroundColor: Colors.orange,
-        foregroundColor: Colors.white,
-      ),
-      body: BlocProvider(
-        create: (context) => getIt<MealRegistrationBloc>(),
-        /*create: (context) => MealRegistrationBloc(
-          addEntry: AddEntry(EntryRepositoryMock())
-        ),*/
-        child: const MealRegistrationForm(),
-      ),
+    return BlocProvider(
+      create: (context) => getIt<MealRegistrationBloc>(),
+      child: const MealRegistrationForm(),
     );
   }
 }
@@ -46,37 +35,38 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
   Future<void> _onSelectImage(SelectImage event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(
       imageUrl: event.imageUrl,
-      status: MealRegistrationStatus.imageSelected,
+      status: MealRegistrationStatus.editing,
     ));
   }
 
   Future<void> _onUpdateMealType(UpdateMealType event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(
       mealType: event.mealType,
-      status: MealRegistrationStatus.mealTypeSelected,
+      status: MealRegistrationStatus.editing,
     ));
   }
 
   Future<void> _onUpdateIngredients(UpdateIngredients event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(
       ingredients: event.ingredients,
-      status: MealRegistrationStatus.ingredientsAdded,
+      status: MealRegistrationStatus.editing,
     ));
   }
 
   Future<void> _onUpdateMood(UpdateMood event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(
       moodBeforeMeal: event.mood,
-      status: MealRegistrationStatus.moodSelected,
+      status: MealRegistrationStatus.editing,
     ));
   }
 
   Future<void> _onUpdateDescription(UpdateDescription event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(
       description: event.description,
+      status: MealRegistrationStatus.editing,
     ));
   }
-  //TODO: here AddEntry usecase should be used and EntryBloc should listen to repo streams of saving data via FormBlocs
+
   Future<void> _onSubmitMeal(SubmitMeal event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(status: MealRegistrationStatus.submitting));
     try {
@@ -91,11 +81,8 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       );
 
       await addEntry.call(entry);
-
-      emit(state.copyWith(
-        status: MealRegistrationStatus.submitted,
-        entry: entry,
-      ));
+      // reset state
+      emit(const MealRegistrationState());
     } catch (e) {
       emit(state.copyWith(error: 'Failed to submit meal: $e'));
     }
@@ -148,6 +135,9 @@ class MealRegistrationState {
   final String? error;
   final MealRegistrationStatus status;
 
+  bool get readyToSave => imageUrl.isNotEmpty;
+  String get ingredientsText => ingredients.join(', ');
+
   const MealRegistrationState({
     this.imageUrl = '',
     this.mealType = MealType.other,
@@ -184,11 +174,7 @@ class MealRegistrationState {
 
 enum MealRegistrationStatus {
   initial,
-  imageSelected,
-  mealTypeSelected,
-  ingredientsAdded,
-  moodSelected,
+  editing,
   submitting,
-  submitted,
   error,
 }

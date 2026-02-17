@@ -1,19 +1,9 @@
 part of 'entry_bloc.dart';
 
-abstract class EntryState {}
-
-class EntryInitial extends EntryState {}
-
-class EntryLoading extends EntryState {}
-
-class EntryLoaded extends EntryState {
-  final List<Entry> entries;
-
-  EntryLoaded(this.entries);
-}
-
-class EntryError extends EntryState {
-  final String message;
-
-  EntryError(this.message);
+@freezed
+sealed class EntryState with _$EntryState {
+  const factory EntryState.initial() = EntryInitial;
+  const factory EntryState.loading() = EntryLoading;
+  const factory EntryState.loaded(List<Entry> entries) = EntryLoaded;
+  const factory EntryState.error(String message) = EntryError;
 }

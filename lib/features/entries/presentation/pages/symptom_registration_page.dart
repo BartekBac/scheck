@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
-import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
 import 'package:scheck/features/entries/presentation/widgets/symptom_registration_form.dart';
 import 'package:scheck/injection.dart';
 
@@ -12,17 +11,9 @@ class SymptomRegistrationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register Symptoms'),
-        elevation: 0,
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-      ),
-      body: BlocProvider(
-        create: (context) => getIt<SymptomRegistrationBloc>(),
-        child: const SymptomRegistrationForm(),
-      ),
+    return BlocProvider(
+      create: (context) => getIt<SymptomRegistrationBloc>(),
+      child: const SymptomRegistrationForm(),
     );
   }
 }
@@ -41,19 +32,21 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
 
   Future<void> _onSelectSymptoms(SelectSymptoms event, Emitter<SymptomRegistrationState> emit) async {
     final selectedSymptoms = List<String>.from(state.selectedSymptoms);
+    final symptomIntensities = Map<String, int>.from(state.symptomIntensities);
     if (selectedSymptoms.contains(event.symptom)) {
       selectedSymptoms.remove(event.symptom);
-      state.symptomIntensities.remove(event.symptom);
+      symptomIntensities.remove(event.symptom);
     } else {
       selectedSymptoms.add(event.symptom);
-      state.symptomIntensities[event.symptom] = 1;
+      symptomIntensities.putIfAbsent(event.symptom, () => 1);
     }
     
     emit(state.copyWith(
       selectedSymptoms: selectedSymptoms,
+      symptomIntensities: symptomIntensities,
       status: selectedSymptoms.isEmpty 
           ? SymptomRegistrationStatus.initial
-          : SymptomRegistrationStatus.symptomsSelected,
+          : SymptomRegistrationStatus.editing,
     ));
   }
 
@@ -63,12 +56,14 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
     
     emit(state.copyWith(
       symptomIntensities: intensities,
+      status: SymptomRegistrationStatus.editing
     ));
   }
 
   Future<void> _onUpdateDescription(UpdateDescription event, Emitter<SymptomRegistrationState> emit) async {
     emit(state.copyWith(
       description: event.description,
+      status: SymptomRegistrationStatus.editing
     ));
   }
 
@@ -82,16 +77,10 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
         symptomIntensities: state.symptomIntensities,
         description: state.description,
       );
-      /*
-      context.read<EntryBloc>().add(AddEntryEvent(entry));
-      Navigator.pop(context);
-       */
 
       await addEntry.call(entry);
-      emit(state.copyWith(
-          status: SymptomRegistrationStatus.submitted,
-          entry: entry
-      ));
+      // reset state
+      emit(const SymptomRegistrationState());
     } catch (e) {
       emit(state.copyWith(error: 'Failed to save symptoms: $e'));
     }
@@ -130,6 +119,8 @@ class SymptomRegistrationState {
   final String? error;
   final SymptomRegistrationStatus status;
 
+  bool get readyToSave => selectedSymptoms.isNotEmpty;
+
   const SymptomRegistrationState({
     this.selectedSymptoms = const [],
     this.symptomIntensities = const {},
@@ -160,9 +151,7 @@ class SymptomRegistrationState {
 
 enum SymptomRegistrationStatus {
   initial,
-  symptomsSelected,
-  intensitySet,
+  editing,
   submitting,
-  submitted,
   error,
 }

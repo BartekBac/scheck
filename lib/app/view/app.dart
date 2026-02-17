@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scheck/features/entries/presentation/pages/home_page.dart';
+import 'package:scheck/features/navigation/presentation/pages/navigation_page.dart';
 import 'package:scheck/l10n/l10n.dart';
 
 class App extends StatelessWidget {
@@ -10,7 +10,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Meal Feel',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         brightness: Brightness.light,
         useMaterial3: true,
       ),
@@ -21,7 +21,7 @@ class App extends StatelessWidget {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const HomePage(),
+      home: const NavigationPage(),
     );
   }
 }
