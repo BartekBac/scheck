@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scheck/core/stylers/color_styler.dart';
+import 'package:scheck/core/stylers/text_styler.dart';
+import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
 import 'package:scheck/features/entries/presentation/widgets/entry_card.dart';
 
@@ -18,20 +21,20 @@ class EntriesLogPage extends StatelessWidget {
         }
         if (state is EntryLoaded) {
           if (state.entries.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.book, size: 64, color: Colors.grey),
+                  Icon(IconFacade.empty, size: 64, color: ColorStyler.Surface.onColor(context)),
                   SizedBox(height: 16),
                   Text(
                     'No entries yet',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyler.Headline.medium(context),
                   ),
                   SizedBox(height: 8),
                   Text(
                     'Start by registering your first meal or symptom',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyler.Body.medium(context),
                   ),
                 ],
               ),

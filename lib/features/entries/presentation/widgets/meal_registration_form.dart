@@ -5,6 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/stylers/color_styler.dart';
+import 'package:scheck/core/stylers/shape_styler.dart';
+import 'package:scheck/core/stylers/text_styler.dart';
+import 'package:scheck/core/utils/dialog_handler.dart';
+import 'package:scheck/core/utils/icon_facade.dart';
+import 'package:scheck/core/widgets/section_title.dart';
+import 'package:scheck/core/widgets/submit_button.dart';
 import 'package:scheck/features/entries/presentation/pages/meal_registration_page.dart';
 import 'package:scheck/features/navigation/presentation/bloc/navigation_bloc.dart';
 
@@ -38,115 +45,68 @@ class MealRegistrationForm extends StatelessWidget {
     );
   }
 
+  void _pickImage(MealRegistrationBloc bloc, ImageSource source) async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: source);
+    if (image != null) {
+      bloc.add(SelectImage(image.path));
+    }
+  }
+
   Widget _buildImageSection(BuildContext context) {
     final bloc = context.read<MealRegistrationBloc>();
     final state = bloc.state;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          'Meal Photo',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SectionTitle('Meal Photo'),
+            IconButton(
+              icon: Icon(IconFacade.gallery),
+              color: ColorStyler.Primary.color(context),
+              onPressed: () async {
+                try {
+                  _pickImage(bloc, ImageSource.gallery);
+                } catch (e) {
+                  log(e.toString(), error: e);
+                  DialogHandler.showSnackBar(context, message: 'Gallery not available.');
+                }
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (bottomSheetContext) => SafeArea(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height / 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                final picker = ImagePicker();
-                                final image = await picker.pickImage(source: ImageSource.camera);
-                                if (image != null) {
-                                  bloc.add(SelectImage(image.path));
-                                  if (bottomSheetContext.mounted) {
-                                    Navigator.pop(bottomSheetContext);
-                                  }
-                                }
-                              } catch (e) {
-                                log(e.toString(), error: e);
-                                if (bottomSheetContext.mounted) {
-                                  Navigator.pop(bottomSheetContext);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      behavior: SnackBarBehavior.floating,
-                                      content: Text('Camera not available. Use gallery instead.'),
-                                      backgroundColor: Colors.orange,
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            child: const Text('Camera'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                final picker = ImagePicker();
-                                final image = await picker.pickImage(source: ImageSource.gallery);
-                                if (image != null) {
-                                  bloc.add(SelectImage(image.path));
-                                  if (bottomSheetContext.mounted) {
-                                    Navigator.pop(bottomSheetContext);
-                                  }
-                                }
-                              } catch (e) {
-                                log(e.toString(), error: e);
-                                if (bottomSheetContext.mounted) {
-                                  Navigator.pop(bottomSheetContext);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      behavior: SnackBarBehavior.floating,
-                                      content: Text('Gallery not available.'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            child: const Text('Gallery'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () => Navigator.pop(bottomSheetContext),
-                        child: const Text('Cancel'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+          onTap: () async {
+            try {
+              _pickImage(bloc, ImageSource.camera);
+            } catch (e) {
+              log(e.toString(), error: e);
+              DialogHandler.showSnackBar(context, message: 'Camera not available. Use gallery instead.');
+            }
           },
           child: Container(
             height: 200,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.grey[100],
+              border: Border.all(color: ColorStyler.Surface.ultraLightOnColor(context)),
+              borderRadius: ShapeStyler.InnerFieldShape.borderRadius,
+              color: ColorStyler.SurfaceContainerLow.color(context),
             ),
             child: state.imageUrl.isEmpty
-                ? const Column(
+                ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.camera_alt, size: 48, color: Colors.grey),
-                      SizedBox(height: 8),
-                      Text('Tap to take photo', style: TextStyle(color: Colors.grey)),
+                      Icon(IconFacade.take_photo, size: 48, color: ColorStyler.Surface.ultraLightOnColor(context)),
+                      const SizedBox(height: 8),
+                      Text('Tap to take photo',
+                          style: TextStyler.Title.small(context).copyWith(color: ColorStyler.Surface.ultraLightOnColor(context))
+                      )
                     ],
                   )
                 : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: ShapeStyler.FieldShape.borderRadius,
                     child: Image.file(
                       File(state.imageUrl),
                       fit: BoxFit.cover,
@@ -165,10 +125,7 @@ class MealRegistrationForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Meal Type',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        const SectionTitle('Meal Type'),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -176,16 +133,19 @@ class MealRegistrationForm extends StatelessWidget {
           children: MealType.values.map((type) {
             return ChoiceChip(
               label: Text(type.label),
+              showCheckmark: false,
               selected: state.mealType == type,
               onSelected: (selected) {
                 if (selected) {
                   context.read<MealRegistrationBloc>().add(UpdateMealType(type));
                 }
               },
-              backgroundColor: Colors.grey[200],
-              selectedColor: Colors.orange,
-              labelStyle: TextStyle(
-                color: state.mealType == type ? Colors.white : Colors.black,
+              backgroundColor: ColorStyler.SurfaceContainerLow.color(context),
+              selectedColor: ColorStyler.PrimaryContainer.color(context),
+              labelStyle: TextStyler.Title.small(context).copyWith(
+                color: state.mealType == type
+                    ? ColorStyler.PrimaryContainer.onColor(context)
+                    : ColorStyler.Surface.ultraLightOnColor(context),
               ),
             );
           }).toList(),
@@ -199,12 +159,10 @@ class MealRegistrationForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Mood Before Meal',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        const SectionTitle('Mood Before Meal'),
         const SizedBox(height: 8),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: Mood.values.map((mood) {
             return GestureDetector(
               onTap: () {
@@ -216,15 +174,21 @@ class MealRegistrationForm extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: state.moodBeforeMeal == mood ? Colors.orange : Colors.grey,
                     width: 2,
+                    color: state.moodBeforeMeal == mood
+                        ? mood.getColor(context)
+                        : ColorStyler.Surface.ultraLightOnColor(context)
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                  color: state.moodBeforeMeal == mood ? Colors.orange : Colors.grey[100],
+                  borderRadius: ShapeStyler.FieldShape.borderRadius,
+                  color: state.moodBeforeMeal == mood
+                      ? ColorStyler.PrimaryContainer.color(context)
+                      : ColorStyler.SurfaceContainerLow.color(context)
                 ),
                 child: Icon(
                   mood.icon,
-                  color: state.moodBeforeMeal == mood ? Colors.white : Colors.black,
+                  color: state.moodBeforeMeal == mood
+                      ? mood.getColor(context)
+                      : ColorStyler.Surface.ultraLightOnColor(context)
                 ),
               ),
             );
@@ -235,25 +199,13 @@ class MealRegistrationForm extends StatelessWidget {
   }
 
   Widget _buildSubmitButton(BuildContext context, MealRegistrationState state) {
-    return ElevatedButton(
-      onPressed: state.readyToSave
-          ? () {
-              context.read<MealRegistrationBloc>().add(SubmitMeal());
-              context.read<NavigationBloc>().add(const NavigationEvent.pageChanged(0));
-            }
-          : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.orange,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: const Text(
-        'Save Meal Entry',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
+    return SubmitButton(
+        title: 'Save Meal Entry',
+        onPressed: () {
+          context.read<MealRegistrationBloc>().add(SubmitMeal());
+          context.read<NavigationBloc>().add(const NavigationEvent.pageChanged(MenuPage.log));
+        },
+        enabled: state.readyToSave,
     );
   }
 }
@@ -297,18 +249,13 @@ class _IngredientsSectionState extends State<_IngredientsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Ingredients',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          const SectionTitle('Ingredients'),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             decoration: InputDecoration(
               hintText: 'Enter ingredients separated by commas',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: ShapeStyler.InputShape.inputBorder
             ),
             onChanged: (value) {
               final endsWithCommaAndWhitespace = RegExp(r',\s*$');
@@ -333,8 +280,8 @@ class _IngredientsSectionState extends State<_IngredientsSection> {
                   children: state.ingredients.map((ingredient) {
                     return Chip(
                       label: Text(ingredient),
-                      backgroundColor: Colors.orange[100],
-                      deleteIcon: const Icon(Icons.close, size: 18),
+                      backgroundColor: ColorStyler.PrimaryContainer.color(context),
+                      deleteIcon: const Icon(IconFacade.close, size: 18),
                       onDeleted: () {
                         final updatedIngredients = List<String>.from(state.ingredients)..remove(ingredient);
                         context.read<MealRegistrationBloc>().add(UpdateIngredients(updatedIngredients));
@@ -389,19 +336,14 @@ class _DescriptionSectionState extends State<_DescriptionSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Description (Optional)',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          const SectionTitle('Description (Optional)'),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Add any additional notes...',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: ShapeStyler.InputShape.inputBorder
             ),
             onChanged: (value) {
               context.read<MealRegistrationBloc>().add(UpdateDescription(value.isEmpty ? null : value));

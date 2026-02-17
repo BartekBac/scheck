@@ -10,7 +10,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Meal Feel',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         brightness: Brightness.light,
         useMaterial3: true,
       ),

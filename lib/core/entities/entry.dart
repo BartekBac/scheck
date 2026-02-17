@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:scheck/core/stylers/color_styler.dart';
+import 'package:scheck/core/utils/icon_facade.dart';
 
 abstract class Entry extends Equatable {
   final String id;
@@ -81,10 +83,26 @@ extension MealTypeExtension on MealType {
 
 extension MoodExtension on Mood {
   IconData get icon => switch(this) {
-    Mood.great => Icons.sentiment_very_satisfied,
-    Mood.good => Icons.sentiment_satisfied,
-    Mood.neutral => Icons.sentiment_neutral,
-    Mood.bad => Icons.sentiment_dissatisfied,
-    Mood.terrible => Icons.sentiment_very_dissatisfied
+    Mood.great => IconFacade.great,
+    Mood.good => IconFacade.good,
+    Mood.neutral => IconFacade.neutral,
+    Mood.bad => IconFacade.bad,
+    Mood.terrible => IconFacade.terrible
+  };
+
+  String get label => switch(this) {
+    Mood.great => 'Great',
+    Mood.good => 'Good',
+    Mood.neutral => 'Neutral',
+    Mood.bad => 'Bad',
+    Mood.terrible => 'Terrible'
+  };
+
+  Color getColor(BuildContext context) => switch(this) {
+    Mood.great => ColorStyler.Positive.color(context),
+    Mood.good => ColorStyler.Positive.scaledColor(context, ratio: 0.8),
+    Mood.neutral => ColorStyler.Surface.scaledOnColor(context, ratio: 0.6),
+    Mood.bad => ColorStyler.Negative.scaledColor(context, ratio: 0.8),
+    Mood.terrible => ColorStyler.Negative.color(context),
   };
 }

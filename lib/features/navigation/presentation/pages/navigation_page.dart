@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
-import 'package:scheck/features/entries/presentation/pages/entries_log_page.dart';
-import 'package:scheck/features/entries/presentation/pages/home_page.dart';
-import 'package:scheck/features/entries/presentation/pages/meal_registration_page.dart';
-import 'package:scheck/features/entries/presentation/pages/symptom_registration_page.dart';
 import 'package:scheck/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:scheck/injection.dart';
 
@@ -28,13 +24,6 @@ class NavigationPage extends StatelessWidget {
 class NavigationView extends StatelessWidget {
   const NavigationView({super.key});
 
-  static const List<Widget> _pages = <Widget>[
-    HomeContent(),
-    MealRegistrationPage(),
-    SymptomRegistrationPage(),
-    EntriesLogPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NavigationBloc, NavigationState>(
@@ -45,34 +34,18 @@ class NavigationView extends StatelessWidget {
             elevation: 0,
           ),
           body: IndexedStack(
-            index: state.pageIndex,
-            children: _pages,
+            index: state.page.index,
+            children: MenuPage.values.map((page) => page.view).toList(),
           ),
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            unselectedItemColor: Colors.grey,
-            currentIndex: state.pageIndex,
+            currentIndex: state.page.index,
             onTap: (index) =>
-                context.read<NavigationBloc>().add(PageChanged(index)),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.restaurant),
-                label: 'Meal',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.sick),
-                label: 'Symptom',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.list),
-                label: 'Log',
-              ),
-            ],
+                context.read<NavigationBloc>().add(PageChanged(MenuPage.values[index])),
+            items: MenuPage.values.map((page) => BottomNavigationBarItem(
+                icon: Icon(page.icon),
+                label: page.name,
+            )).toList(),
           ),
         );
       },

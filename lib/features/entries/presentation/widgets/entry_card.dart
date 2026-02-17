@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/stylers/color_styler.dart';
+import 'package:scheck/core/stylers/shape_styler.dart';
+import 'package:scheck/core/stylers/text_styler.dart';
 import 'package:scheck/core/utils/dialog_handler.dart';
+import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
 
 class EntryCard extends StatefulWidget {
@@ -25,7 +29,7 @@ class _EntryCardState extends State<EntryCard> {
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ShapeStyler.FieldShape.borderRadius,
         child: Column(
           children: [
             GestureDetector(
@@ -71,17 +75,31 @@ class _EntryCardState extends State<EntryCard> {
         Expanded(
           child: Container(
             height: 40,
-            decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)), color: Colors.amber),
             child: Row(children: [
               Expanded(child: InkWell(
                 onTap: () => _showEntryDetailsDialog(context, widget.entry),
-                child: ColoredBox(color: Colors.grey,  child: Center(child: Text('Info')))
-              )),
+                child: ColoredBox(
+                    color: ColorStyler.PrimaryContainer.color(context),
+                    child: Center(child: Text('Info', style: TextStyler.Body.medium(context).copyWith(color: ColorStyler.PrimaryContainer.onColor(context)))
+                )
+              ))),
               Expanded(child: InkWell(
                 onTap: () => DialogHandler.showConfirmDialog(context, 'Are you sure you want to delete this entry?')
-                    .then((confirmed) => confirmed ? context.read<EntryBloc>().add(DeleteEntryEvent(widget.entry)) : null),
-                child: ColoredBox(color:Colors.red, child: Center(child: Text('Delete')))
-              )) //TODO start using ColorStyler and IconStyler
+                    .then(
+                        (confirmed) {
+                          if (confirmed) {
+                            context.read<EntryBloc>().add(DeleteEntryEvent(
+                                widget.entry));
+                            setState(() {
+                              _showBottomMenu = false;
+                            });
+                          }
+                        }
+                    ),
+                child: ColoredBox(
+                    color: ColorStyler.ErrorContainer.color(context),
+                    child: Center(child: Text('Delete', style: TextStyler.Body.medium(context).copyWith(color: ColorStyler.ErrorContainer.onColor(context)))))
+              ))
             ],
             ),
           ),
@@ -128,7 +146,7 @@ class _EntryCardState extends State<EntryCard> {
                 Row(children: [
                   Text('Mood: '),
                   Icon(
-                    entry.moodBeforeMeal?.icon ?? Icons.do_not_disturb_sharp,
+                    entry.moodBeforeMeal?.icon ?? IconFacade.empty,
                     size: 20,
                   ),
                   Text(
@@ -153,7 +171,7 @@ class _EntryCardState extends State<EntryCard> {
           TextButton(
             child: const Text('Delete'),
             style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
+              foregroundColor: ColorStyler.Error.color(context),
             ),
             onPressed: () async {
               context.read<EntryBloc>().add(DeleteEntryEvent(entry));
@@ -177,17 +195,11 @@ class _EntryCardState extends State<EntryCard> {
           children: [
             Text(
               timeFormat.format(widget.entry.timestamp),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyler.Title.large(context).copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
               dateFormat.format(widget.entry.timestamp),
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyler.Body.medium(context).copyWith(color: ColorStyler.Surface.lightOnColor(context)),
             ),
           ],
         ),
@@ -196,32 +208,37 @@ class _EntryCardState extends State<EntryCard> {
     );
   }
 
+  Widget _buildEntryIcon({
+    required IconData icon,
+    required Color foregroundColor,
+    required Color backgroundColor})
+  {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: ShapeStyler.FieldShape.borderRadius,
+      ),
+      child: Icon(
+        icon,
+        color: foregroundColor,
+        size: 24,
+      ),
+    );
+  }
+
   Widget _buildEntryTypeIcon() {
     if (widget.entry is MealEntry) {
-      return Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.orange[100],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(
-          Icons.restaurant,
-          color: Colors.orange,
-          size: 24,
-        ),
+      return _buildEntryIcon(
+          icon: IconFacade.meal,
+          foregroundColor: ColorStyler.Primary.color(context),
+          backgroundColor: ColorStyler.PrimaryContainer.color(context)
       );
     } else {
-      return Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.red[100],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(
-          Icons.sick,
-          color: Colors.red,
-          size: 24,
-        ),
+      return _buildEntryIcon(
+          icon: IconFacade.symptom,
+          foregroundColor: ColorStyler.Error.color(context),
+          backgroundColor: ColorStyler.ErrorContainer.color(context)
       );
     }
   }
@@ -253,34 +270,33 @@ class _EntryCardState extends State<EntryCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoRow('Meal Type', _getMealTypeLabel(mealEntry.mealType)),
+        _buildInfoRow(label: 'Meal Type', value: Text(mealEntry.mealType.label)),
         _buildMealImage(mealEntry),
+        const SizedBox(height: 8),
         if (mealEntry.ingredients.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          _buildInfoRow('Ingredients', mealEntry.ingredients.join(', ')),
+          _buildInfoRow(label: 'Ingredients', value: Text(mealEntry.ingredients.join(', '))),
         ],
-        if (mealEntry.moodBeforeMeal != null) ...[
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Text('Mood: '),
-              const SizedBox(width: 4),
-              Icon(
-                _getMoodIcon(mealEntry.moodBeforeMeal!),
-                color: _getMoodColor(mealEntry.moodBeforeMeal!),
-                size: 20,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                _getMoodLabel(mealEntry.moodBeforeMeal!),
-                style: TextStyle(
-                  color: _getMoodColor(mealEntry.moodBeforeMeal!),
-                ),
-              ),
-            ],
-          ),
-        ],
+        if (mealEntry.moodBeforeMeal != null)
+          _buildMoodRow(mealEntry.moodBeforeMeal!),
       ],
+    );
+  }
+
+  Widget _buildMoodRow(Mood mood) {
+    return _buildInfoRow(
+        label: 'Mood',
+        value: Row(
+          children: [
+            Icon(mood.icon,
+              color: mood.getColor(context),
+              size: 20,
+            ),
+            const SizedBox(width: 4),
+            Text(mood.label,
+              style: TextStyler.Body.medium(context).copyWith(color: mood.getColor(context)),
+            ),
+          ],
+        )
     );
   }
 
@@ -301,22 +317,19 @@ class _EntryCardState extends State<EntryCard> {
                   children: [
                     Text(
                       symptom,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      style: TextStyler.Title.medium(context),
                     ),
                     Text(
                       '$intensity/10',
-                      style: const TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyler.Title.medium(context).copyWith(color: ColorStyler.Error.lightColor(context)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 LinearProgressIndicator(
                   value: intensity / 10,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  backgroundColor: ColorStyler.ErrorContainer.lightColor(context),
+                  valueColor: AlwaysStoppedAnimation<Color>(ColorStyler.Error.color(context)),
                 ),
               ],
             ),
@@ -330,102 +343,36 @@ class _EntryCardState extends State<EntryCard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
+        color: ColorStyler.SurfaceContainerHigh.color(context),
+        borderRadius: ShapeStyler.InnerFieldShape.borderRadius,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          Text(
             'Notes',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
+            style: TextStyler.Title.small(context).copyWith(color: ColorStyler.SurfaceContainerHigh.ultraLightOnColor(context)),
           ),
           const SizedBox(height: 4),
-          Text(widget.entry.description!),
+          Text(widget.entry.description!, style: TextStyler.Body.small(context).copyWith(color: ColorStyler.SurfaceContainerHigh.lightOnColor(context))),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow({required String label, required Widget value}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '$label: ',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.grey,
-          ),
+          style: TextStyler.Label.large(context),
         ),
         const SizedBox(width: 4),
         Expanded(
-          child: Text(value),
+          child: value,
         ),
       ],
     );
-  }
-
-  String _getMealTypeLabel(MealType type) {
-    switch (type) {
-      case MealType.breakfast:
-        return 'Breakfast';
-      case MealType.lunch:
-        return 'Lunch';
-      case MealType.dinner:
-        return 'Dinner';
-      case MealType.snack:
-        return 'Snack';
-      case MealType.other:
-        return 'Other';
-    }
-  }
-
-  String _getMoodLabel(Mood mood) {
-    switch (mood) {
-      case Mood.great:
-        return 'Great';
-      case Mood.good:
-        return 'Good';
-      case Mood.neutral:
-        return 'Neutral';
-      case Mood.bad:
-        return 'Bad';
-      case Mood.terrible:
-        return 'Terrible';
-    }
-  }
-
-  IconData _getMoodIcon(Mood mood) {
-    switch (mood) {
-      case Mood.great:
-        return Icons.sentiment_very_satisfied;
-      case Mood.good:
-        return Icons.sentiment_satisfied;
-      case Mood.neutral:
-        return Icons.sentiment_neutral;
-      case Mood.bad:
-        return Icons.sentiment_dissatisfied;
-      case Mood.terrible:
-        return Icons.sentiment_very_dissatisfied;
-    }
-  }
-
-  Color _getMoodColor(Mood mood) {
-    switch (mood) {
-      case Mood.great:
-        return Colors.green;
-      case Mood.good:
-        return Colors.lightGreen;
-      case Mood.neutral:
-        return Colors.orange;
-      case Mood.bad:
-        return Colors.orange[700]!;
-      case Mood.terrible:
-        return Colors.red;
-    }
   }
 }

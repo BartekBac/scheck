@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$NavigationEvent {
 
- int get index;
+ MenuPage get page;
 /// Create a copy of NavigationEvent
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $NavigationEventCopyWith<NavigationEvent> get copyWith => _$NavigationEventCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationEvent&&(identical(other.index, index) || other.index == index));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationEvent&&(identical(other.page, page) || other.page == page));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,index);
+int get hashCode => Object.hash(runtimeType,page);
 
 @override
 String toString() {
-  return 'NavigationEvent(index: $index)';
+  return 'NavigationEvent(page: $page)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $NavigationEventCopyWith<$Res>  {
   factory $NavigationEventCopyWith(NavigationEvent value, $Res Function(NavigationEvent) _then) = _$NavigationEventCopyWithImpl;
 @useResult
 $Res call({
- int index
+ MenuPage page
 });
 
 
@@ -62,10 +62,10 @@ class _$NavigationEventCopyWithImpl<$Res>
 
 /// Create a copy of NavigationEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? index = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? page = null,}) {
   return _then(_self.copyWith(
-index: null == index ? _self.index : index // ignore: cast_nullable_to_non_nullable
-as int,
+page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as MenuPage,
   ));
 }
 
@@ -147,10 +147,10 @@ return pageChanged(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( int index)?  pageChanged,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( MenuPage page)?  pageChanged,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case PageChanged() when pageChanged != null:
-return pageChanged(_that.index);case _:
+return pageChanged(_that.page);case _:
   return orElse();
 
 }
@@ -168,10 +168,10 @@ return pageChanged(_that.index);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( int index)  pageChanged,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( MenuPage page)  pageChanged,}) {final _that = this;
 switch (_that) {
 case PageChanged():
-return pageChanged(_that.index);}
+return pageChanged(_that.page);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -185,10 +185,10 @@ return pageChanged(_that.index);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( int index)?  pageChanged,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( MenuPage page)?  pageChanged,}) {final _that = this;
 switch (_that) {
 case PageChanged() when pageChanged != null:
-return pageChanged(_that.index);case _:
+return pageChanged(_that.page);case _:
   return null;
 
 }
@@ -200,10 +200,10 @@ return pageChanged(_that.index);case _:
 
 
 class PageChanged implements NavigationEvent {
-  const PageChanged(this.index);
+  const PageChanged(this.page);
   
 
-@override final  int index;
+@override final  MenuPage page;
 
 /// Create a copy of NavigationEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -215,16 +215,16 @@ $PageChangedCopyWith<PageChanged> get copyWith => _$PageChangedCopyWithImpl<Page
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PageChanged&&(identical(other.index, index) || other.index == index));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PageChanged&&(identical(other.page, page) || other.page == page));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,index);
+int get hashCode => Object.hash(runtimeType,page);
 
 @override
 String toString() {
-  return 'NavigationEvent.pageChanged(index: $index)';
+  return 'NavigationEvent.pageChanged(page: $page)';
 }
 
 
@@ -235,7 +235,7 @@ abstract mixin class $PageChangedCopyWith<$Res> implements $NavigationEventCopyW
   factory $PageChangedCopyWith(PageChanged value, $Res Function(PageChanged) _then) = _$PageChangedCopyWithImpl;
 @override @useResult
 $Res call({
- int index
+ MenuPage page
 });
 
 
@@ -252,10 +252,10 @@ class _$PageChangedCopyWithImpl<$Res>
 
 /// Create a copy of NavigationEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? index = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? page = null,}) {
   return _then(PageChanged(
-null == index ? _self.index : index // ignore: cast_nullable_to_non_nullable
-as int,
+null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as MenuPage,
   ));
 }
 
@@ -265,7 +265,7 @@ as int,
 /// @nodoc
 mixin _$NavigationState {
 
- int get pageIndex;
+ MenuPage get page;
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -276,16 +276,16 @@ $NavigationStateCopyWith<NavigationState> get copyWith => _$NavigationStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationState&&(identical(other.pageIndex, pageIndex) || other.pageIndex == pageIndex));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationState&&(identical(other.page, page) || other.page == page));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,pageIndex);
+int get hashCode => Object.hash(runtimeType,page);
 
 @override
 String toString() {
-  return 'NavigationState(pageIndex: $pageIndex)';
+  return 'NavigationState(page: $page)';
 }
 
 
@@ -296,7 +296,7 @@ abstract mixin class $NavigationStateCopyWith<$Res>  {
   factory $NavigationStateCopyWith(NavigationState value, $Res Function(NavigationState) _then) = _$NavigationStateCopyWithImpl;
 @useResult
 $Res call({
- int pageIndex
+ MenuPage page
 });
 
 
@@ -313,10 +313,10 @@ class _$NavigationStateCopyWithImpl<$Res>
 
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? pageIndex = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? page = null,}) {
   return _then(_self.copyWith(
-pageIndex: null == pageIndex ? _self.pageIndex : pageIndex // ignore: cast_nullable_to_non_nullable
-as int,
+page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as MenuPage,
   ));
 }
 
@@ -398,10 +398,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int pageIndex)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( MenuPage page)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _NavigationState() when $default != null:
-return $default(_that.pageIndex);case _:
+return $default(_that.page);case _:
   return orElse();
 
 }
@@ -419,10 +419,10 @@ return $default(_that.pageIndex);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int pageIndex)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( MenuPage page)  $default,) {final _that = this;
 switch (_that) {
 case _NavigationState():
-return $default(_that.pageIndex);}
+return $default(_that.page);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -436,10 +436,10 @@ return $default(_that.pageIndex);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int pageIndex)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( MenuPage page)?  $default,) {final _that = this;
 switch (_that) {
 case _NavigationState() when $default != null:
-return $default(_that.pageIndex);case _:
+return $default(_that.page);case _:
   return null;
 
 }
@@ -451,10 +451,10 @@ return $default(_that.pageIndex);case _:
 
 
 class _NavigationState implements NavigationState {
-  const _NavigationState({this.pageIndex = 0});
+  const _NavigationState({this.page = MenuPage.log});
   
 
-@override@JsonKey() final  int pageIndex;
+@override@JsonKey() final  MenuPage page;
 
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
@@ -466,16 +466,16 @@ _$NavigationStateCopyWith<_NavigationState> get copyWith => __$NavigationStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NavigationState&&(identical(other.pageIndex, pageIndex) || other.pageIndex == pageIndex));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NavigationState&&(identical(other.page, page) || other.page == page));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,pageIndex);
+int get hashCode => Object.hash(runtimeType,page);
 
 @override
 String toString() {
-  return 'NavigationState(pageIndex: $pageIndex)';
+  return 'NavigationState(page: $page)';
 }
 
 
@@ -486,7 +486,7 @@ abstract mixin class _$NavigationStateCopyWith<$Res> implements $NavigationState
   factory _$NavigationStateCopyWith(_NavigationState value, $Res Function(_NavigationState) _then) = __$NavigationStateCopyWithImpl;
 @override @useResult
 $Res call({
- int pageIndex
+ MenuPage page
 });
 
 
@@ -503,10 +503,10 @@ class __$NavigationStateCopyWithImpl<$Res>
 
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? pageIndex = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? page = null,}) {
   return _then(_NavigationState(
-pageIndex: null == pageIndex ? _self.pageIndex : pageIndex // ignore: cast_nullable_to_non_nullable
-as int,
+page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as MenuPage,
   ));
 }
 

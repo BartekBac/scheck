@@ -28,4 +28,15 @@ class DialogHandler {
       },
     ) ?? false;
   }
+
+  static void showSnackBar(BuildContext context, {required String message, Color? backgroundColor}) {
+    backgroundColor ??= ColorStyler.Error.color(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(message),
+        backgroundColor: backgroundColor,
+      ),
+    );
+  }
 }

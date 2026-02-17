@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scheck/core/stylers/color_styler.dart';
+import 'package:scheck/core/stylers/shape_styler.dart';
+import 'package:scheck/core/stylers/text_styler.dart';
+import 'package:scheck/core/widgets/section_title.dart';
+import 'package:scheck/core/widgets/submit_button.dart';
 import 'package:scheck/features/entries/presentation/pages/symptom_registration_page.dart';
 import 'package:scheck/features/navigation/presentation/bloc/navigation_bloc.dart';
 
@@ -51,10 +56,7 @@ class SymptomRegistrationForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Select Symptoms',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        const SectionTitle('Select Symptoms'),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -67,9 +69,9 @@ class SymptomRegistrationForm extends StatelessWidget {
               onSelected: (selected) {
                 context.read<SymptomRegistrationBloc>().add(SelectSymptoms(symptom));
               },
-              selectedColor: Colors.red[100],
-              backgroundColor: Colors.grey[200],
-              checkmarkColor: Colors.red,
+              selectedColor: ColorStyler.ErrorContainer.color(context),
+              backgroundColor: ColorStyler.SurfaceContainerLow.color(context),
+              checkmarkColor: ColorStyler.Error.color(context),
             );
           }).toList(),
         ),
@@ -82,10 +84,7 @@ class SymptomRegistrationForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Set Intensity',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        const SectionTitle('Set Intensity'),
         const SizedBox(height: 16),
         ListView.builder(
           shrinkWrap: true,
@@ -104,11 +103,11 @@ class SymptomRegistrationForm extends StatelessWidget {
                     children: [
                       Text(
                         symptom,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyler.Title.small(context),
                       ),
                       Text(
                         'Intensity: $intensity/10',
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyler.Title.small(context).copyWith(color: ColorStyler.Error.lightColor(context)),
                       ),
                     ],
                   ),
@@ -122,7 +121,7 @@ class SymptomRegistrationForm extends StatelessWidget {
                         UpdateSymptomIntensity(symptom, value.round()),
                       );
                     },
-                    activeColor: Colors.red,
+                    activeColor: ColorStyler.Error.color(context),
                   ),
                   Row(
                     children: List.generate(5, (i) {
@@ -131,8 +130,10 @@ class SymptomRegistrationForm extends StatelessWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 2),
                           height: 4,
                           decoration: BoxDecoration(
-                            color: i < (intensity / 2) ? Colors.red : Colors.grey[300],
-                            borderRadius: BorderRadius.circular(2),
+                            color: i < (intensity / 2)
+                                ? ColorStyler.Error.color(context)
+                                : ColorStyler.ErrorContainer.lightColor(context),
+                            borderRadius: ShapeStyler.FieldShape.borderRadius,
                           ),
                         ),
                       );
@@ -151,18 +152,16 @@ class SymptomRegistrationForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Description (Optional)',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        const SectionTitle('Description (Optional)'),
         const SizedBox(height: 8),
         TextField(
           maxLines: 3,
           decoration: InputDecoration(
-            hintText: 'Add any additional notes about your symptoms...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+            focusedBorder: ShapeStyler.InputShape.inputBorder.copyWith(
+                borderSide: BorderSide(color: ColorStyler.Error.color(context), width: 2)
             ),
+            hintText: 'Add any additional notes...',
+            border: ShapeStyler.InputShape.inputBorder,
           ),
           onChanged: (value) {
             context.read<SymptomRegistrationBloc>().add(
@@ -175,25 +174,14 @@ class SymptomRegistrationForm extends StatelessWidget {
   }
 
   Widget _buildSubmitButton(BuildContext context, SymptomRegistrationState state) {
-    return ElevatedButton(
-      onPressed: state.readyToSave
-          ? () {
-              context.read<SymptomRegistrationBloc>().add(SubmitSymptoms());
-              context.read<NavigationBloc>().add(const NavigationEvent.pageChanged(0));
-            }
-          : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: const Text(
-        'Save Symptom Entry',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
+    return SubmitButton(
+        title: 'Save Symptom Entry',
+        onPressed: () {
+          context.read<SymptomRegistrationBloc>().add(SubmitSymptoms());
+          context.read<NavigationBloc>().add(const NavigationEvent.pageChanged(MenuPage.log));
+        },
+        colorStyler: ColorStyler.Error,
+        enabled: state.readyToSave,
     );
   }
 }
