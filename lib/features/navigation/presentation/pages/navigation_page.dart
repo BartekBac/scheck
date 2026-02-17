@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
 import 'package:scheck/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:scheck/injection.dart';
+import 'package:scheck/l10n/l10n.dart';
 
 class NavigationPage extends StatelessWidget {
   const NavigationPage({super.key});
@@ -26,11 +27,12 @@ class NavigationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocBuilder<NavigationBloc, NavigationState>(
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Meal Feel'), // TODO: This should be dynamic
+            title: Text(l10n.appTitle),
             elevation: 0,
           ),
           body: IndexedStack(
@@ -42,10 +44,12 @@ class NavigationView extends StatelessWidget {
             currentIndex: state.page.index,
             onTap: (index) =>
                 context.read<NavigationBloc>().add(PageChanged(MenuPage.values[index])),
-            items: MenuPage.values.map((page) => BottomNavigationBarItem(
-                icon: Icon(page.icon),
-                label: page.name,
-            )).toList(),
+            items: MenuPage.values
+                .map((page) => BottomNavigationBarItem(
+                      icon: Icon(page.icon),
+                      label: page.getName(l10n),
+                    ))
+                .toList(),
           ),
         );
       },
