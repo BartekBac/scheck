@@ -4,17 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/entities/symptom.dart';
 import 'package:scheck/core/stylers/color_styler.dart';
 import 'package:scheck/core/stylers/shape_styler.dart';
 import 'package:scheck/core/stylers/text_styler.dart';
 import 'package:scheck/core/utils/dialog_handler.dart';
 import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
+import 'package:scheck/l10n/l10n.dart';
 
 class EntryCard extends StatefulWidget {
   final Entry entry;
 
-  EntryCard({super.key, required this.entry});
+  const EntryCard({super.key, required this.entry});
 
   @override
   State<EntryCard> createState() => _EntryCardState();
@@ -42,15 +44,14 @@ class _EntryCardState extends State<EntryCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(),
+                    _buildHeader(context),
                     const SizedBox(height: 12),
-                    if (widget.entry is MealEntry) _buildMealDetails(widget.entry as MealEntry),
-                    if (widget.entry is SymptomEntry) _buildSymptomDetails(widget.entry as SymptomEntry),
+                    if (widget.entry is MealEntry) _buildMealDetails(context, widget.entry as MealEntry),
+                    if (widget.entry is SymptomEntry) _buildSymptomDetails(context, widget.entry as SymptomEntry),
                     if (widget.entry.description != null) ...[
                       const SizedBox(height: 12),
-                      _buildDescription(),
+                      _buildDescription(context),
                     ],
-
                   ],
                 ),
               ),
@@ -70,37 +71,44 @@ class _EntryCardState extends State<EntryCard> {
   }
 
   Widget _buildBottomMenu(BuildContext context) {
+    final l10n = context.l10n;
     return Row(
       children: [
         Expanded(
-          child: Container(
+          child: SizedBox(
             height: 40,
-            child: Row(children: [
-              Expanded(child: InkWell(
-                onTap: () => _showEntryDetailsDialog(context, widget.entry),
-                child: ColoredBox(
-                    color: ColorStyler.PrimaryContainer.color(context),
-                    child: Center(child: Text('Info', style: TextStyler.Body.medium(context).copyWith(color: ColorStyler.PrimaryContainer.onColor(context)))
-                )
-              ))),
-              Expanded(child: InkWell(
-                onTap: () => DialogHandler.showConfirmDialog(context, 'Are you sure you want to delete this entry?')
-                    .then(
-                        (confirmed) {
-                          if (confirmed) {
-                            context.read<EntryBloc>().add(DeleteEntryEvent(
-                                widget.entry));
-                            setState(() {
-                              _showBottomMenu = false;
-                            });
-                          }
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => _showEntryDetailsDialog(context, widget.entry),
+                    child: ColoredBox(
+                        color: ColorStyler.PrimaryContainer.color(context),
+                        child: Center(
+                            child: Text(l10n.buttonInfo,
+                                style: TextStyler.Body.medium(context)
+                                    .copyWith(color: ColorStyler.PrimaryContainer.onColor(context))))),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                      onTap: () => DialogHandler.showConfirmDialog(context, l10n.dialogConfirmDeleteEntry).then(
+                          (confirmed) {
+                        if (confirmed == true) {
+                          context.read<EntryBloc>().add(DeleteEntryEvent(widget.entry));
+                          setState(() {
+                            _showBottomMenu = false;
+                          });
                         }
-                    ),
-                child: ColoredBox(
-                    color: ColorStyler.ErrorContainer.color(context),
-                    child: Center(child: Text('Delete', style: TextStyler.Body.medium(context).copyWith(color: ColorStyler.ErrorContainer.onColor(context)))))
-              ))
-            ],
+                      }),
+                      child: ColoredBox(
+                          color: ColorStyler.ErrorContainer.color(context),
+                          child: Center(
+                              child: Text(l10n.buttonDelete,
+                                  style: TextStyler.Body.medium(context)
+                                      .copyWith(color: ColorStyler.ErrorContainer.onColor(context)))))),
+                )
+              ],
             ),
           ),
         ),
@@ -108,68 +116,47 @@ class _EntryCardState extends State<EntryCard> {
     );
   }
 
-
   void _showEntryDetailsDialog(BuildContext context, Entry entry) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(entry.timestamp.toString().substring(0, 16)),
+        title: Text(DateFormat.yMMMd().add_jm().format(entry.timestamp)),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(children: [Text('Id: ${entry.id}')]),
-            if (entry is SymptomEntry)...[
+            Text(l10n.detailsDialogIdLabel(entry.id)),
+            if (entry is SymptomEntry) ...[
+              Text(l10n.detailsDialogSymptomsLabel(entry.symptoms
+                  .map((key) => Symptom.values.firstWhere((s) => s.key == key).getLabel(l10n))
+                  .join(', '))),
+              Text(l10n.detailsDialogIntensitiesLabel(entry.symptomIntensities.toString())),
+            ],
+            if (entry is MealEntry) ...[
+              Text(l10n.detailsDialogMealLabel(entry.mealType.label)),
+              Flexible(child: Text(l10n.detailsDialogImageLabel(entry.imageUrl))),
               Row(
                 children: [
-                  Text(
-                    'Symptoms: ${entry.symptoms.join(", ")}',
-                  ),
+                  Text(l10n.detailsDialogMoodLabel),
+                  Icon(entry.moodBeforeMeal?.icon ?? IconFacade.empty, size: 20),
+                  Text(entry.moodBeforeMeal?.label ?? l10n.generalNotAvailable),
                 ],
               ),
-              Row(
-                children: [
-                  Text('Intensities: ${entry.symptomIntensities.toString()}')
-                ],
-              )
+              Text(l10n.detailsDialogIngredientsLabel(entry.ingredients.join(", "))),
             ],
-            if (entry is MealEntry)
-              ...[
-                Row(children: [
-                  Text('Meal: ${entry.mealType.name}'),
-                ]),
-                Row(children: [
-                  Flexible(
-                    child: Text('Image: ${entry.imageUrl}'),
-                  ),
-                ]),
-                Row(children: [
-                  Text('Mood: '),
-                  Icon(
-                    entry.moodBeforeMeal?.icon ?? IconFacade.empty,
-                    size: 20,
-                  ),
-                  Text(
-                      entry.moodBeforeMeal?.name ?? 'N/A'
-                  ),
-                ],),
-                Row(children: [
-                  Text('Ingredients: ${entry.ingredients.join(", ")}'),
-                ],),
-              ],
-            if (entry.description != null)
-              Text('Description: ${entry.description}'),
+            if (entry.description != null) Text(l10n.detailsDialogDescriptionLabel(entry.description!)),
           ],
         ),
         actions: [
           TextButton(
-            child: const Text('Close'),
+            child: Text(l10n.buttonClose),
             onPressed: () {
               Navigator.of(dialogContext).pop();
             },
           ),
           TextButton(
-            child: const Text('Delete'),
+            child: Text(l10n.buttonDelete),
             style: TextButton.styleFrom(
               foregroundColor: ColorStyler.Error.color(context),
             ),
@@ -183,7 +170,7 @@ class _EntryCardState extends State<EntryCard> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     final timeFormat = DateFormat('HH:mm');
     final dateFormat = DateFormat('yyyy-MM-dd');
 
@@ -203,16 +190,13 @@ class _EntryCardState extends State<EntryCard> {
             ),
           ],
         ),
-        _buildEntryTypeIcon(),
+        _buildEntryTypeIcon(context),
       ],
     );
   }
 
-  Widget _buildEntryIcon({
-    required IconData icon,
-    required Color foregroundColor,
-    required Color backgroundColor})
-  {
+  Widget _buildEntryIcon(
+      {required IconData icon, required Color foregroundColor, required Color backgroundColor}) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -227,19 +211,17 @@ class _EntryCardState extends State<EntryCard> {
     );
   }
 
-  Widget _buildEntryTypeIcon() {
+  Widget _buildEntryTypeIcon(BuildContext context) {
     if (widget.entry is MealEntry) {
       return _buildEntryIcon(
           icon: IconFacade.meal,
           foregroundColor: ColorStyler.Primary.color(context),
-          backgroundColor: ColorStyler.PrimaryContainer.color(context)
-      );
+          backgroundColor: ColorStyler.PrimaryContainer.color(context));
     } else {
       return _buildEntryIcon(
           icon: IconFacade.symptom,
           foregroundColor: ColorStyler.Error.color(context),
-          backgroundColor: ColorStyler.ErrorContainer.color(context)
-      );
+          backgroundColor: ColorStyler.ErrorContainer.color(context));
     }
   }
 
@@ -266,47 +248,50 @@ class _EntryCardState extends State<EntryCard> {
     }
   }
 
-  Widget _buildMealDetails(MealEntry mealEntry) {
+  Widget _buildMealDetails(BuildContext context, MealEntry mealEntry) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoRow(label: 'Meal Type', value: Text(mealEntry.mealType.label)),
+        _buildInfoRow(label: l10n.titleMealType, value: Text(mealEntry.mealType.label)),
         _buildMealImage(mealEntry),
         const SizedBox(height: 8),
         if (mealEntry.ingredients.isNotEmpty) ...[
-          _buildInfoRow(label: 'Ingredients', value: Text(mealEntry.ingredients.join(', '))),
+          _buildInfoRow(label: l10n.titleIngredients, value: Text(mealEntry.ingredients.join(', '))),
         ],
-        if (mealEntry.moodBeforeMeal != null)
-          _buildMoodRow(mealEntry.moodBeforeMeal!),
+        if (mealEntry.moodBeforeMeal != null) _buildMoodRow(context, mealEntry.moodBeforeMeal!),
       ],
     );
   }
 
-  Widget _buildMoodRow(Mood mood) {
+  Widget _buildMoodRow(BuildContext context, Mood mood) {
     return _buildInfoRow(
-        label: 'Mood',
+        label: context.l10n.titleMood,
         value: Row(
           children: [
-            Icon(mood.icon,
+            Icon(
+              mood.icon,
               color: mood.getColor(context),
               size: 20,
             ),
             const SizedBox(width: 4),
-            Text(mood.label,
+            Text(
+              mood.label,
               style: TextStyler.Body.medium(context).copyWith(color: mood.getColor(context)),
             ),
           ],
-        )
-    );
+        ));
   }
 
-  Widget _buildSymptomDetails(SymptomEntry symptomEntry) {
+  Widget _buildSymptomDetails(BuildContext context, SymptomEntry symptomEntry) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
-        ...symptomEntry.symptoms.map((symptom) {
-          final intensity = symptomEntry.symptomIntensities[symptom] ?? 1;
+        ...symptomEntry.symptoms.map((symptomKey) {
+          final symptom = Symptom.values.firstWhere((s) => s.key == symptomKey);
+          final intensity = symptomEntry.symptomIntensities[symptomKey] ?? 1;
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Column(
@@ -316,11 +301,11 @@ class _EntryCardState extends State<EntryCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      symptom,
+                      symptom.getLabel(l10n),
                       style: TextStyler.Title.medium(context),
                     ),
                     Text(
-                      '$intensity/10',
+                      l10n.labelIntensityShort(intensity),
                       style: TextStyler.Title.medium(context).copyWith(color: ColorStyler.Error.lightColor(context)),
                     ),
                   ],
@@ -339,7 +324,8 @@ class _EntryCardState extends State<EntryCard> {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -350,11 +336,14 @@ class _EntryCardState extends State<EntryCard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Notes',
-            style: TextStyler.Title.small(context).copyWith(color: ColorStyler.SurfaceContainerHigh.ultraLightOnColor(context)),
+            l10n.titleNotes,
+            style: TextStyler.Title.small(context)
+                .copyWith(color: ColorStyler.SurfaceContainerHigh.ultraLightOnColor(context)),
           ),
           const SizedBox(height: 4),
-          Text(widget.entry.description!, style: TextStyler.Body.small(context).copyWith(color: ColorStyler.SurfaceContainerHigh.lightOnColor(context))),
+          Text(widget.entry.description!,
+              style: TextStyler.Body.small(context)
+                  .copyWith(color: ColorStyler.SurfaceContainerHigh.lightOnColor(context))),
         ],
       ),
     );
@@ -369,9 +358,7 @@ class _EntryCardState extends State<EntryCard> {
           style: TextStyler.Label.large(context),
         ),
         const SizedBox(width: 4),
-        Expanded(
-          child: value,
-        ),
+        Expanded(child: value),
       ],
     );
   }

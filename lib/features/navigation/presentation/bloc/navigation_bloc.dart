@@ -5,6 +5,7 @@ import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/features/entries/presentation/pages/entries_log_page.dart';
 import 'package:scheck/features/entries/presentation/pages/meal_registration_page.dart';
 import 'package:scheck/features/entries/presentation/pages/symptom_registration_page.dart';
+import 'package:scheck/l10n/gen/app_localizations.dart';
 
 part 'navigation_bloc.freezed.dart';
 
@@ -15,10 +16,10 @@ enum MenuPage {
 }
 
 extension MenuPageExtension on MenuPage {
-  String get name => switch (this) {
-    MenuPage.log => 'Log',
-    MenuPage.mealRegister => 'Meal',
-    MenuPage.symptomRegister => 'Symptom',
+  String getName(AppLocalizations l10n) => switch (this) {
+    MenuPage.log => l10n.pageNavigationLog,
+    MenuPage.mealRegister => l10n.pageNavigationMeal,
+    MenuPage.symptomRegister => l10n.pageNavigationSymptom,
   };
 
   IconData get icon => switch (this) {

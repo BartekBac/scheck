@@ -5,6 +5,7 @@ import 'package:scheck/core/stylers/text_styler.dart';
 import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart';
 import 'package:scheck/features/entries/presentation/widgets/entry_card.dart';
+import 'package:scheck/l10n/l10n.dart';
 
 class EntriesLogPage extends StatelessWidget {
   const EntriesLogPage({super.key});
@@ -17,7 +18,7 @@ class EntriesLogPage extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (state is EntryError) {
-          return Center(child: Text(state.message));
+          return Center(child: Text(context.l10n.errorFailedToLoadEntries));
         }
         if (state is EntryLoaded) {
           if (state.entries.isEmpty) {
@@ -26,15 +27,16 @@ class EntriesLogPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(IconFacade.empty, size: 64, color: ColorStyler.Surface.onColor(context)),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    'No entries yet',
+                    context.l10n.pageEntriesLogNoEntriesTitle,
                     style: TextStyler.Headline.medium(context),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    'Start by registering your first meal or symptom',
+                    context.l10n.pageEntriesLogNoEntriesHint,
                     style: TextStyler.Body.medium(context),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),

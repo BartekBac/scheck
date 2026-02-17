@@ -1,7 +1,132 @@
 {
     "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
+
+    "appTitle": "Meal Feel",
+    "generalNotAvailable": "N/A",
+
+    "buttonInfo": "Info",
+    "buttonDelete": "Delete",
+    "buttonClose": "Close",
+    "buttonSaveMealEntry": "Save Meal Entry",
+    "buttonSaveSymptomEntry": "Save Symptom Entry",
+
+    "titleNotes": "Notes",
+    "titleMealType": "Meal Type",
+    "titleIngredients": "Ingredients",
+    "titleMood": "Mood",
+    "titleMoodBeforeMeal": "Mood Before Meal",
+    "titleSelectSymptoms": "Select Symptoms",
+    "titleSetIntensity": "Set Intensity",
+    "titleDescriptionOptional": "Description (Optional)",
+    "titleMealPhoto": "Meal Photo",
+    "labelIntensity": "Intensity: {intensity}/10",
+    "@labelIntensity": {
+        "placeholders": {
+            "intensity": {
+                "type": "int"
+            }
+        }
+    },
+    "labelIntensityShort": "{intensity}/10",
+    "@labelIntensityShort": {
+        "placeholders": {
+            "intensity": {
+                "type": "int"
+            }
+        }
+    },
+
+
+    "hintAddNotes": "Add any additional notes...",
+    "hintEnterIngredients": "Enter ingredients separated by commas",
+    "hintTapToTakePhoto": "Tap to take photo",
+    "dialogConfirmDeleteEntry": "Are you sure you want to delete this entry?",
+
+
+    "errorFailedToLoadEntries": "Failed to load entries.",
+    "errorFailedToSaveMeal": "Failed to save meal.",
+    "errorFailedToSaveSymptoms": "Failed to save symptoms.",
+    "errorGalleryNotAvailable": "Gallery not available.",
+    "errorCameraNotAvailable": "Camera not available. Use gallery instead.",
+
+
+    "pageNavigationHome": "Home",
+    "pageNavigationMeal": "Meal",
+    "pageNavigationSymptom": "Symptom",
+    "pageNavigationLog": "Log",
+    "pageEntriesLogNoEntriesTitle": "No entries yet",
+    "pageEntriesLogNoEntriesHint": "Start by registering your first meal or symptom",
+
+
+    "symptomAbdominalPain": "Abdominal pain",
+    "symptomBloating": "Bloating",
+    "symptomNausea": "Nausea",
+    "symptomHeartburn": "Heartburn",
+    "symptomDiarrhea": "Diarrhea",
+    "symptomConstipation": "Constipation",
+    "symptomFatigue": "Fatigue",
+    "symptomHeadache": "Headache",
+    "symptomJointPain": "Joint pain",
+    "symptomSkinRash": "Skin rash",
+    "symptomAnxiety": "Anxiety",
+    "symptomBrainFog": "Brain fog",
+
+
+    "detailsDialogIdLabel": "Id: {id}",
+    "@detailsDialogIdLabel": {
+        "placeholders": {
+            "id": {
+                "type": "String"
+            }
+        }
+    },
+    "detailsDialogSymptomsLabel": "Symptoms: {symptoms}",
+    "@detailsDialogSymptomsLabel": {
+        "placeholders": {
+            "symptoms": {
+                "type": "String"
+            }
+        }
+    },
+    "detailsDialogIntensitiesLabel": "Intensities: {intensities}",
+    "@detailsDialogIntensitiesLabel": {
+        "placeholders": {
+            "intensities": {
+                "type": "String"
+            }
+        }
+    },
+    "detailsDialogMealLabel": "Meal: {mealType}",
+    "@detailsDialogMealLabel": {
+        "placeholders": {
+            "mealType": {
+                "type": "String"
+            }
+        }
+    },
+    "detailsDialogImageLabel": "Image: {imageUrl}",
+    "@detailsDialogImageLabel": {
+        "placeholders": {
+            "imageUrl": {
+                "type": "String"
+            }
+        }
+    },
+    "detailsDialogMoodLabel": "Mood: ",
+    "detailsDialogIngredientsLabel": "Ingredients: {ingredients}",
+    "@detailsDialogIngredientsLabel": {
+        "placeholders": {
+            "ingredients": {
+                "type": "String"
+            }
+        }
+    },
+    "detailsDialogDescriptionLabel": "Description: {description}",
+    "@detailsDialogDescriptionLabel": {
+        "placeholders": {
+            "description": {
+                "type": "String"
+            }
+        }
     }
 }

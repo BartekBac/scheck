@@ -5,6 +5,7 @@ import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/presentation/widgets/symptom_registration_form.dart';
 import 'package:scheck/injection.dart';
+import 'package:scheck/l10n/l10n.dart';
 
 class SymptomRegistrationPage extends StatelessWidget {
   const SymptomRegistrationPage({super.key});
@@ -40,11 +41,11 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
       selectedSymptoms.add(event.symptom);
       symptomIntensities.putIfAbsent(event.symptom, () => 1);
     }
-    
+
     emit(state.copyWith(
       selectedSymptoms: selectedSymptoms,
       symptomIntensities: symptomIntensities,
-      status: selectedSymptoms.isEmpty 
+      status: selectedSymptoms.isEmpty
           ? SymptomRegistrationStatus.initial
           : SymptomRegistrationStatus.editing,
     ));
@@ -53,7 +54,7 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
   Future<void> _onUpdateSymptomIntensity(UpdateSymptomIntensity event, Emitter<SymptomRegistrationState> emit) async {
     final intensities = Map<String, int>.from(state.symptomIntensities);
     intensities[event.symptom] = event.intensity;
-    
+
     emit(state.copyWith(
       symptomIntensities: intensities,
       status: SymptomRegistrationStatus.editing
@@ -82,7 +83,7 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
       // reset state
       emit(const SymptomRegistrationState());
     } catch (e) {
-      emit(state.copyWith(error: 'Failed to save symptoms: $e'));
+      emit(state.copyWith(status: SymptomRegistrationStatus.error, error: SymptomRegistrationError.saveError));
     }
   }
 }
@@ -110,13 +111,22 @@ class UpdateDescription extends SymptomRegistrationEvent {
 
 class SubmitSymptoms extends SymptomRegistrationEvent {}
 
+enum SymptomRegistrationError {
+  saveError
+}
+
+extension SymptomRegistrationErrorExtension on SymptomRegistrationError {
+  String getMessage(AppLocalizations l10n) => switch(this) {
+    SymptomRegistrationError.saveError => l10n.errorFailedToSaveSymptoms
+  };
+}
+
 @immutable
 class SymptomRegistrationState {
   final List<String> selectedSymptoms;
   final Map<String, int> symptomIntensities;
-  final SymptomEntry? entry;
   final String? description;
-  final String? error;
+  final SymptomRegistrationError? error;
   final SymptomRegistrationStatus status;
 
   bool get readyToSave => selectedSymptoms.isNotEmpty;
@@ -124,7 +134,6 @@ class SymptomRegistrationState {
   const SymptomRegistrationState({
     this.selectedSymptoms = const [],
     this.symptomIntensities = const {},
-    this.entry,
     this.description,
     this.error,
     this.status = SymptomRegistrationStatus.initial,
@@ -133,15 +142,13 @@ class SymptomRegistrationState {
   SymptomRegistrationState copyWith({
     List<String>? selectedSymptoms,
     Map<String, int>? symptomIntensities,
-    SymptomEntry? entry,
     String? description,
-    String? error,
+    SymptomRegistrationError? error,
     SymptomRegistrationStatus? status,
   }) {
     return SymptomRegistrationState(
       selectedSymptoms: selectedSymptoms ?? this.selectedSymptoms,
       symptomIntensities: symptomIntensities ?? this.symptomIntensities,
-      entry: entry ?? this.entry,
       description: description ?? this.description,
       error: error ?? this.error,
       status: status ?? this.status,

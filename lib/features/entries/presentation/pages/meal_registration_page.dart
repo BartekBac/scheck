@@ -5,6 +5,7 @@ import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/presentation/widgets/meal_registration_form.dart';
 import 'package:scheck/injection.dart';
+import 'package:scheck/l10n/gen/app_localizations.dart';
 
 class MealRegistrationPage extends StatelessWidget {
   const MealRegistrationPage({super.key});
@@ -84,7 +85,7 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       // reset state
       emit(const MealRegistrationState());
     } catch (e) {
-      emit(state.copyWith(error: 'Failed to submit meal: $e'));
+      emit(state.copyWith(status: MealRegistrationStatus.error, error: MealRegistrationError.saveError));
     }
   }
 }
@@ -123,6 +124,16 @@ class UpdateDescription extends MealRegistrationEvent {
 
 class SubmitMeal extends MealRegistrationEvent {}
 
+enum MealRegistrationError {
+  saveError
+}
+
+extension MealRegistrationErrorExtension on MealRegistrationError {
+  String getMessage(AppLocalizations l10n) => switch(this) {
+    MealRegistrationError.saveError => l10n.errorFailedToSaveMeal
+  };
+}
+
 
 @immutable
 class MealRegistrationState {
@@ -130,9 +141,8 @@ class MealRegistrationState {
   final MealType mealType;
   final List<String> ingredients;
   final Mood? moodBeforeMeal;
-  final MealEntry? entry;
   final String? description;
-  final String? error;
+  final MealRegistrationError? error;
   final MealRegistrationStatus status;
 
   bool get readyToSave => imageUrl.isNotEmpty;
@@ -143,7 +153,6 @@ class MealRegistrationState {
     this.mealType = MealType.other,
     this.ingredients = const [],
     this.moodBeforeMeal,
-    this.entry,
     this.description,
     this.error,
     this.status = MealRegistrationStatus.initial,
@@ -154,9 +163,8 @@ class MealRegistrationState {
     MealType? mealType,
     List<String>? ingredients,
     Mood? moodBeforeMeal,
-    MealEntry? entry,
     String? description,
-    String? error,
+    MealRegistrationError? error,
     MealRegistrationStatus? status,
   }) {
     return MealRegistrationState(
@@ -164,7 +172,6 @@ class MealRegistrationState {
       mealType: mealType ?? this.mealType,
       ingredients: ingredients ?? this.ingredients,
       moodBeforeMeal: moodBeforeMeal ?? this.moodBeforeMeal,
-      entry: entry ?? this.entry,
       description: description ?? this.description,
       error: error ?? this.error,
       status: status ?? this.status,

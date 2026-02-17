@@ -9,11 +9,13 @@ import 'package:scheck/core/stylers/color_styler.dart';
 import 'package:scheck/core/stylers/shape_styler.dart';
 import 'package:scheck/core/stylers/text_styler.dart';
 import 'package:scheck/core/utils/dialog_handler.dart';
+import 'package:scheck/core/utils/error_handler.dart';
 import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/core/widgets/section_title.dart';
 import 'package:scheck/core/widgets/submit_button.dart';
 import 'package:scheck/features/entries/presentation/pages/meal_registration_page.dart';
 import 'package:scheck/features/navigation/presentation/bloc/navigation_bloc.dart';
+import 'package:scheck/l10n/l10n.dart';
 
 class MealRegistrationForm extends StatelessWidget {
   const MealRegistrationForm({super.key});
@@ -22,23 +24,32 @@ class MealRegistrationForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<MealRegistrationBloc, MealRegistrationState>(
       builder: (context, state) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildImageSection(context),
-              const SizedBox(height: 24),
-              _buildMealTypeSelector(context),
-              const SizedBox(height: 24),
-              const _IngredientsSection(),
-              const SizedBox(height: 24),
-              _buildMoodSection(context),
-              const SizedBox(height: 24),
-              const _DescriptionSection(),
-              const SizedBox(height: 32),
-              _buildSubmitButton(context, state),
-            ],
+        return BlocListener<MealRegistrationBloc, MealRegistrationState>(
+          listenWhen: (prev, curr) => curr.status == MealRegistrationStatus.error,
+          listener: (context, state) {
+            if(state.error != null) {
+              ErrorHandler.showAtSnackBar(
+                  context, state.error!.getMessage(context.l10n));
+            }
+          },
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildImageSection(context),
+                const SizedBox(height: 24),
+                _buildMealTypeSelector(context),
+                const SizedBox(height: 24),
+                const _IngredientsSection(),
+                const SizedBox(height: 24),
+                _buildMoodSection(context),
+                const SizedBox(height: 24),
+                const _DescriptionSection(),
+                const SizedBox(height: 32),
+                _buildSubmitButton(context, state),
+              ],
+            ),
           ),
         );
       },
@@ -54,6 +65,7 @@ class MealRegistrationForm extends StatelessWidget {
   }
 
   Widget _buildImageSection(BuildContext context) {
+    final l10n = context.l10n;
     final bloc = context.read<MealRegistrationBloc>();
     final state = bloc.state;
     return Column(
@@ -62,7 +74,7 @@ class MealRegistrationForm extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SectionTitle('Meal Photo'),
+            SectionTitle(l10n.titleMealPhoto),
             IconButton(
               icon: Icon(IconFacade.gallery),
               color: ColorStyler.Primary.color(context),
@@ -71,7 +83,7 @@ class MealRegistrationForm extends StatelessWidget {
                   _pickImage(bloc, ImageSource.gallery);
                 } catch (e) {
                   log(e.toString(), error: e);
-                  DialogHandler.showSnackBar(context, message: 'Gallery not available.');
+                  DialogHandler.showSnackBar(context, message: l10n.errorGalleryNotAvailable);
                 }
               },
             ),
@@ -84,7 +96,7 @@ class MealRegistrationForm extends StatelessWidget {
               _pickImage(bloc, ImageSource.camera);
             } catch (e) {
               log(e.toString(), error: e);
-              DialogHandler.showSnackBar(context, message: 'Camera not available. Use gallery instead.');
+              DialogHandler.showSnackBar(context, message: l10n.errorCameraNotAvailable);
             }
           },
           child: Container(
@@ -100,9 +112,8 @@ class MealRegistrationForm extends StatelessWidget {
                     children: [
                       Icon(IconFacade.take_photo, size: 48, color: ColorStyler.Surface.ultraLightOnColor(context)),
                       const SizedBox(height: 8),
-                      Text('Tap to take photo',
-                          style: TextStyler.Title.small(context).copyWith(color: ColorStyler.Surface.ultraLightOnColor(context))
-                      )
+                      Text(l10n.hintTapToTakePhoto,
+                          style: TextStyler.Title.small(context).copyWith(color: ColorStyler.Surface.ultraLightOnColor(context)))
                     ],
                   )
                 : ClipRRect(
@@ -121,11 +132,12 @@ class MealRegistrationForm extends StatelessWidget {
   }
 
   Widget _buildMealTypeSelector(BuildContext context) {
+    final l10n = context.l10n;
     final state = context.read<MealRegistrationBloc>().state;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle('Meal Type'),
+        SectionTitle(l10n.titleMealType),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -155,11 +167,12 @@ class MealRegistrationForm extends StatelessWidget {
   }
 
   Widget _buildMoodSection(BuildContext context) {
+    final l10n = context.l10n;
     final state = context.read<MealRegistrationBloc>().state;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle('Mood Before Meal'),
+        SectionTitle(l10n.titleMoodBeforeMeal),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -199,8 +212,9 @@ class MealRegistrationForm extends StatelessWidget {
   }
 
   Widget _buildSubmitButton(BuildContext context, MealRegistrationState state) {
+    final l10n = context.l10n;
     return SubmitButton(
-        title: 'Save Meal Entry',
+        title: l10n.buttonSaveMealEntry,
         onPressed: () {
           context.read<MealRegistrationBloc>().add(SubmitMeal());
           context.read<NavigationBloc>().add(const NavigationEvent.pageChanged(MenuPage.log));
@@ -235,6 +249,7 @@ class _IngredientsSectionState extends State<_IngredientsSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocListener<MealRegistrationBloc, MealRegistrationState>(
       listenWhen: (previous, current) => previous.ingredients != current.ingredients,
       listener: (context, state) {
@@ -249,12 +264,12 @@ class _IngredientsSectionState extends State<_IngredientsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionTitle('Ingredients'),
+          SectionTitle(l10n.titleIngredients),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             decoration: InputDecoration(
-              hintText: 'Enter ingredients separated by commas',
+              hintText: l10n.hintEnterIngredients,
               border: ShapeStyler.InputShape.inputBorder
             ),
             onChanged: (value) {
@@ -322,6 +337,7 @@ class _DescriptionSectionState extends State<_DescriptionSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocListener<MealRegistrationBloc, MealRegistrationState>(
       listenWhen: (previous, current) => previous.description != current.description,
       listener: (context, state) {
@@ -336,13 +352,13 @@ class _DescriptionSectionState extends State<_DescriptionSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionTitle('Description (Optional)'),
+          SectionTitle(l10n.titleDescriptionOptional),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
-              hintText: 'Add any additional notes...',
+              hintText: l10n.hintAddNotes,
               border: ShapeStyler.InputShape.inputBorder
             ),
             onChanged: (value) {
