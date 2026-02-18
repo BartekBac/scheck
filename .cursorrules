@@ -1,0 +1,241 @@
+# SCheck AI Agent Development Guidelines
+
+## Project Overview
+SCheck is a self-check health tracking Flutter app built with Clean Architecture + BLoC pattern. The app helps users track meals and symptoms for better health monitoring.
+
+## Architecture & Patterns
+
+### Core Architecture
+- **Clean Architecture** with strict separation of concerns
+- **BLoC** for state management using flutter_bloc
+- **Dependency Injection** with get_it + injectable
+- **Database**: Drift for SQL, Isar for object storage
+- **Code Generation**: freezed, injectable_generator, json_serializable, drift_dev
+
+### Directory Structure
+```
+lib/
+├── app/                    # App configuration and main widget
+├── core/                   # Shared utilities, entities, widgets
+│   ├── entities/          # Core business entities
+│   ├── utils/             # Utility classes (IconFacade, etc.)
+│   ├── widgets/           # Reusable UI components
+│   └── stylers/           # Theme and styling utilities
+├── features/              # Feature modules
+│   └── [feature]/
+│       ├── data/          # Data layer (models, datasources, repositories impl)
+│       ├── domain/        # Domain layer (entities, repositories, usecases)
+│       └── presentation/  # UI layer (pages, widgets, bloc)
+├── l10n/                  # Internationalization
+└── injection.dart         # DI configuration
+```
+
+## Development Standards
+
+### Code Style
+- Follow `very_good_analysis` linting rules
+- Use `freezed` for immutable data classes
+- Always add `@injectable` to dependencies
+- Use `equatable` for value equality
+- Follow Clean Architecture strictly
+
+### BLoC Implementation
+```dart
+// Standard BLoC pattern with freezed
+@freezed
+sealed class [Feature]Event with _[Feature]Event {
+  const factory [Feature]Event.[action]([params]) = [Action];
+}
+
+@freezed
+sealed class [Feature]State with _[Feature]State {
+  const factory [Feature]State({
+    @Default([initialState]) [Type] [field],
+  }) = _[Feature]State;
+}
+
+class [Feature]Bloc extends Bloc<[Feature]Event, [Feature]State> {
+  [Feature]Bloc(this._usecase) : super(const _[Feature]State()) {
+    on<[Action]>((event, emit) async {
+      // Handle event
+    });
+  }
+}
+```
+
+### UseCase Pattern
+```dart
+@injectable
+class [Action][Entity] {
+  final [Entity]Repository _repository;
+  
+  [Action][Entity](this._repository);
+  
+  Future<[ReturnType]> call([Params]) async {
+    return await _repository.[method]([params]);
+  }
+}
+```
+
+### Repository Pattern
+```dart
+// Domain layer - abstract interface
+abstract class [Entity]Repository {
+  Future<[ReturnType]> [method]([Params]);
+}
+
+// Data layer - implementation
+@injectable
+class [Entity]RepositoryImpl implements [Entity]Repository {
+  final [DataSource] _dataSource;
+  
+  [Entity]RepositoryImpl(this._dataSource);
+  
+  @override
+  Future<[ReturnType]> [method]([Params]) async {
+    return await _dataSource.[method]([params]);
+  }
+}
+```
+
+## Key Dependencies & Usage
+
+### State Management
+- `bloc` + `flutter_bloc` for state management
+- Always use freezed for events and states
+- Implement proper error handling in BLoCs
+
+### Dependency Injection
+- Use `get_it` + `injectable` for DI
+- Mark all dependencies with `@injectable`
+- Run `flutter packages pub run build_runner build` after changes
+
+### Database
+- `drift` for SQL database operations
+- `isar` for object storage
+- Always generate code after schema changes
+
+### Serialization
+- `json_annotation` + `json_serializable` for JSON
+- `freezed_annotation` + `freezed` for immutable classes
+
+### Localization
+- Use `flutter_localizations`
+- Add strings to `lib/l10n/arb/app_en.arb`
+- Run `flutter gen-l10n` after changes
+- Access via `context.l10n.[key]`
+
+## UI/UX Guidelines
+
+### Material Design
+- Follow Material Design 3 principles
+- Use `IconFacade` for consistent icons
+- Maintain consistent spacing and typography
+
+### Navigation
+- Use `NavigationBloc` for app-level navigation
+- Implement proper page transitions
+- Handle deep links appropriately
+
+### Forms & Input
+- Validate user input properly
+- Show appropriate error messages
+- Use proper keyboard types
+
+## Testing Guidelines
+
+### Unit Tests
+- Test use cases separately
+- Mock dependencies using `mocktail`
+- Test BLoC events and states
+- Aim for high coverage
+
+### Widget Tests
+- Test UI components
+- Verify user interactions
+- Test navigation flows
+
+## Development Workflow
+
+### Environment Setup
+- Use flavor-based builds (development, staging, production)
+- Run appropriate main file for each flavor
+- Configure environment-specific settings
+
+### Code Generation
+- Run `flutter packages pub run build_runner build` after:
+  - Adding new freezed classes
+  - Modifying injection dependencies
+  - Changing drift schemas
+  - Updating JSON serialization
+
+### Git Workflow
+- Follow feature branch workflow
+- Write descriptive commit messages
+- Ensure all tests pass before PR
+
+## Common Patterns to Follow
+
+### Error Handling
+```dart
+try {
+  final result = await usecase(params);
+  emit(state.copyWith(status: Status.success, data: result));
+} catch (e) {
+  emit(state.copyWith(status: Status.failure, error: e.toString()));
+}
+```
+
+### Loading States
+```dart
+@freezed
+sealed class [Feature]State with _[Feature]State {
+  const factory [Feature]State({
+    @Default(Status.initial) Status status,
+    @Default([]) List<[Type]> data,
+    String? error,
+  }) = _[Feature]State;
+}
+```
+
+### API Response Handling
+- Always handle network errors gracefully
+- Show appropriate loading indicators
+- Cache responses when applicable
+
+## Security Considerations
+
+- Never hardcode API keys or sensitive data
+- Use secure storage for credentials
+- Validate all user inputs
+- Implement proper authentication flows
+
+## Performance Optimization
+
+- Use const constructors where possible
+- Implement lazy loading for large lists
+- Optimize image loading and caching
+- Monitor app performance regularly
+
+## Platform-Specific Guidelines
+
+### Android
+- Follow Material Design guidelines
+- Handle permissions properly
+- Optimize for different screen sizes
+
+### iOS
+- Follow Human Interface Guidelines
+- Handle iOS-specific permissions
+- Optimize for iOS performance patterns
+
+## Code Review Checklist
+
+- [ ] Follows Clean Architecture principles
+- [ ] Proper error handling implemented
+- [ ] Tests written and passing
+- [ ] Code generation run successfully
+- [ ] Localization strings added
+- [ ] Documentation updated
+- [ ] Performance considerations addressed
+- [ ] Security best practices followed
