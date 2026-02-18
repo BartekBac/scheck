@@ -19,6 +19,8 @@
     "titleSetIntensity": "Set Intensity",
     "titleDescriptionOptional": "Description (Optional)",
     "titleMealPhoto": "Meal Photo",
+    "titleLanguage": "Language",
+    "titlePrimaryColor": "Primary Color",
     "labelIntensity": "Intensity: {intensity}/10",
     "@labelIntensity": {
         "placeholders": {
@@ -44,6 +46,7 @@
 
 
     "errorFailedToLoadEntries": "Failed to load entries.",
+    "errorFailedToLoadSettings": "Failed to load settings.",
     "errorFailedToSaveMeal": "Failed to save meal.",
     "errorFailedToSaveSymptoms": "Failed to save symptoms.",
     "errorGalleryNotAvailable": "Gallery not available.",
@@ -54,6 +57,7 @@
     "pageNavigationMeal": "Meal",
     "pageNavigationSymptom": "Symptom",
     "pageNavigationLog": "Log",
+    "pageNavigationSettings": "Settings",
     "pageEntriesLogNoEntriesTitle": "No entries yet",
     "pageEntriesLogNoEntriesHint": "Start by registering your first meal or symptom",
 
@@ -70,6 +74,9 @@
     "symptomSkinRash": "Skin rash",
     "symptomAnxiety": "Anxiety",
     "symptomBrainFog": "Brain fog",
+
+    "languageEnglish": "English",
+    "languageSpanish": "Spanish",
 
 
     "detailsDialogIdLabel": "Id: {id}",

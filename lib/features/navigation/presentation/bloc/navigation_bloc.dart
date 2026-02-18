@@ -5,6 +5,7 @@ import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/features/entries/presentation/pages/entries_log_page.dart';
 import 'package:scheck/features/entries/presentation/pages/meal_registration_page.dart';
 import 'package:scheck/features/entries/presentation/pages/symptom_registration_page.dart';
+import 'package:scheck/features/settings/presentation/pages/settings_page.dart';
 import 'package:scheck/l10n/gen/app_localizations.dart';
 
 part 'navigation_bloc.freezed.dart';
@@ -13,6 +14,7 @@ enum MenuPage {
   log,
   mealRegister,
   symptomRegister,
+  settings,
 }
 
 extension MenuPageExtension on MenuPage {
@@ -20,18 +22,21 @@ extension MenuPageExtension on MenuPage {
     MenuPage.log => l10n.pageNavigationLog,
     MenuPage.mealRegister => l10n.pageNavigationMeal,
     MenuPage.symptomRegister => l10n.pageNavigationSymptom,
+    MenuPage.settings => l10n.pageNavigationSettings,
   };
 
   IconData get icon => switch (this) {
     MenuPage.log => IconFacade.log,
     MenuPage.mealRegister => IconFacade.meal,
     MenuPage.symptomRegister => IconFacade.symptom,
+    MenuPage.settings => IconFacade.settings,
   };
 
   Widget get view => switch (this) {
     MenuPage.log => const EntriesLogPage(),
     MenuPage.mealRegister => const MealRegistrationPage(),
     MenuPage.symptomRegister => const SymptomRegistrationPage(),
+    MenuPage.settings => const SettingsPage(),
   };
 }
 

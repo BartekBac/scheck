@@ -1,0 +1,62 @@
+# SCheck Windsurf Agent Configuration
+
+## Project Context
+You are working on SCheck, a Flutter health tracking app built with Clean Architecture, BLoC, and dependency injection.
+
+## Primary Directives
+1. **Always follow Clean Architecture principles** - never cross layer boundaries
+2. **Use BLoC for state management** - never use setState
+3. **Generate code after schema/model changes** - run build_runner
+4. **Write tests for all business logic** - use mocktail for mocking
+5. **Follow the established patterns** - don't introduce new architectures
+
+## Critical Rules
+- **NEVER** access data layer directly from presentation
+- **ALWAYS** use dependency injection with @injectable
+- **ALWAYS** use freezed for events and states
+- **NEVER** hardcode strings - use localization
+- **ALWAYS** handle errors properly in BLoCs
+- **NEVER** skip running code generation after changes
+
+## File Structure Compliance
+```
+features/[feature]/
+├── data/          # Only data sources, models, repository implementations
+├── domain/        # Only entities, repository interfaces, use cases
+└── presentation/  # Only UI, BLoCs, pages
+```
+
+## Required Commands After Changes
+```bash
+# After any freezed/injectable/schema changes
+flutter packages pub run build_runner build
+
+# After localization changes
+flutter gen-l10n --arb-dir="lib/l10n/arb"
+```
+
+## Code Style Enforcement
+- Use very_good_analysis linting
+- Follow existing naming conventions
+- Add proper documentation
+- Include error handling
+
+## Testing Requirements
+- Unit tests for all use cases
+- BLoC tests for state management
+- Widget tests for UI components
+- Mock all dependencies
+
+## Security & Performance
+- Never hardcode sensitive data
+- Use const constructors
+- Optimize for mobile performance
+- Handle memory properly
+
+## Before Submitting Code
+- [ ] Code generation completed successfully
+- [ ] All tests pass
+- [ ] Localization strings added
+- [ ] Architecture boundaries respected
+- [ ] Error handling implemented
+- [ ] Documentation updated

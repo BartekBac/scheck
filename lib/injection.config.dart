@@ -39,6 +39,18 @@ import 'package:scheck/features/entries/presentation/pages/meal_registration_pag
     as _i671;
 import 'package:scheck/features/entries/presentation/pages/symptom_registration_page.dart'
     as _i955;
+import 'package:scheck/features/settings/data/datasources/settings_local_data_source.dart'
+    as _i637;
+import 'package:scheck/features/settings/data/repositories/settings_repository_impl.dart'
+    as _i844;
+import 'package:scheck/features/settings/domain/repositories/settings_repository.dart'
+    as _i1000;
+import 'package:scheck/features/settings/domain/usecases/get_settings.dart'
+    as _i65;
+import 'package:scheck/features/settings/domain/usecases/save_settings.dart'
+    as _i677;
+import 'package:scheck/features/settings/presentation/bloc/settings_bloc.dart'
+    as _i685;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -48,17 +60,33 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.lazySingleton<_i57.SqfliteDatabase>(() => _i57.SqfliteDatabase());
+    gh.lazySingleton<_i637.SettingsLocalDataSource>(
+      () => _i637.SettingsLocalDataSource(),
+    );
     gh.lazySingleton<_i459.EntryRemoteDataSource>(
       () => _i481.EntryRemoteDataSourceMock(),
     );
     gh.lazySingleton<_i583.EntryLocalDataSource>(
       () => _i2.SqfliteEntryLocalDataSource(gh<_i57.SqfliteDatabase>()),
     );
+    gh.factory<_i1000.SettingsRepository>(
+      () => _i844.SettingsRepositoryImpl(gh<_i637.SettingsLocalDataSource>()),
+    );
+    gh.lazySingleton<_i65.GetSettings>(
+      () => _i65.GetSettings(gh<_i1000.SettingsRepository>()),
+    );
+    gh.lazySingleton<_i677.SaveSettings>(
+      () => _i677.SaveSettings(gh<_i1000.SettingsRepository>()),
+    );
     gh.lazySingleton<_i59.EntryRepository>(
       () => _i160.EntryRepositoryImpl(
         gh<_i583.EntryLocalDataSource>(),
         gh<_i459.EntryRemoteDataSource>(),
       ),
+    );
+    gh.factory<_i685.SettingsBloc>(
+      () =>
+          _i685.SettingsBloc(gh<_i65.GetSettings>(), gh<_i677.SaveSettings>()),
     );
     gh.factory<_i292.AddEntry>(
       () => _i292.AddEntry(gh<_i59.EntryRepository>()),
