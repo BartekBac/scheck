@@ -11,14 +11,16 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:scheck/features/entries/data/datasources/drift/app_drift_database.dart'
+    as _i112;
+import 'package:scheck/features/entries/data/datasources/drift/drift_entry_local_data_source.dart'
+    as _i962;
 import 'package:scheck/features/entries/data/datasources/entry_local_data_source.dart'
     as _i583;
 import 'package:scheck/features/entries/data/datasources/entry_remote_data_source.dart'
     as _i459;
 import 'package:scheck/features/entries/data/datasources/sqflite/sqflite_database.dart'
     as _i57;
-import 'package:scheck/features/entries/data/datasources/sqflite/sqflite_entry_local_data_source.dart'
-    as _i2;
 import 'package:scheck/features/entries/data/datasources/supabase/entry_remote_data_source_mock.dart'
     as _i481;
 import 'package:scheck/features/entries/data/repositories/entry_repository_impl.dart'
@@ -59,6 +61,7 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    gh.factory<_i112.AppDriftDatabase>(() => _i112.AppDriftDatabase());
     gh.lazySingleton<_i57.SqfliteDatabase>(() => _i57.SqfliteDatabase());
     gh.lazySingleton<_i637.SettingsLocalDataSource>(
       () => _i637.SettingsLocalDataSource(),
@@ -67,16 +70,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i481.EntryRemoteDataSourceMock(),
     );
     gh.lazySingleton<_i583.EntryLocalDataSource>(
-      () => _i2.SqfliteEntryLocalDataSource(gh<_i57.SqfliteDatabase>()),
-    );
-    gh.factory<_i1000.SettingsRepository>(
-      () => _i844.SettingsRepositoryImpl(gh<_i637.SettingsLocalDataSource>()),
-    );
-    gh.lazySingleton<_i65.GetSettings>(
-      () => _i65.GetSettings(gh<_i1000.SettingsRepository>()),
-    );
-    gh.lazySingleton<_i677.SaveSettings>(
-      () => _i677.SaveSettings(gh<_i1000.SettingsRepository>()),
+      () => _i962.DriftEntryLocalDataSource(gh<_i112.AppDriftDatabase>()),
     );
     gh.lazySingleton<_i59.EntryRepository>(
       () => _i160.EntryRepositoryImpl(
@@ -84,9 +78,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i459.EntryRemoteDataSource>(),
       ),
     );
-    gh.factory<_i685.SettingsBloc>(
-      () =>
-          _i685.SettingsBloc(gh<_i65.GetSettings>(), gh<_i677.SaveSettings>()),
+    gh.factory<_i1000.SettingsRepository>(
+      () => _i844.SettingsRepositoryImpl(gh<_i637.SettingsLocalDataSource>()),
     );
     gh.factory<_i292.AddEntry>(
       () => _i292.AddEntry(gh<_i59.EntryRepository>()),
@@ -96,6 +89,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i891.WatchEntries>(
       () => _i891.WatchEntries(gh<_i59.EntryRepository>()),
+    );
+    gh.lazySingleton<_i65.GetSettings>(
+      () => _i65.GetSettings(gh<_i1000.SettingsRepository>()),
+    );
+    gh.lazySingleton<_i677.SaveSettings>(
+      () => _i677.SaveSettings(gh<_i1000.SettingsRepository>()),
     );
     gh.factory<_i955.GetEntries>(
       () => _i955.GetEntries(gh<_i59.EntryRepository>()),
@@ -113,6 +112,10 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i955.SymptomRegistrationBloc>(
       () => _i955.SymptomRegistrationBloc(addEntry: gh<_i292.AddEntry>()),
+    );
+    gh.factory<_i685.SettingsBloc>(
+      () =>
+          _i685.SettingsBloc(gh<_i65.GetSettings>(), gh<_i677.SaveSettings>()),
     );
     return this;
   }

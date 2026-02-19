@@ -30,6 +30,12 @@ class _EntryCardState extends State<EntryCard> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
+      /*color: (widget.entry is MealEntry)
+          ? ColorStyler.PrimaryContainer.ultraLightColor(context)
+          : ColorStyler.ErrorContainer.ultraLightColor(context),
+      shadowColor: (widget.entry is MealEntry)
+          ? ColorStyler.PrimaryContainer.ultraLightColor(context)
+          : ColorStyler.ErrorContainer.ultraLightColor(context),*/
       child: ClipRRect(
         borderRadius: ShapeStyler.FieldShape.borderRadius,
         child: Column(

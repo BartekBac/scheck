@@ -1,8 +1,10 @@
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
 import 'package:scheck/features/entries/data/datasources/drift/app_drift_database.dart';
 import 'package:scheck/features/entries/data/datasources/entry_local_data_source.dart';
 import 'package:scheck/features/entries/data/models/entry_model.dart';
 
+@LazySingleton(as: EntryLocalDataSource)
 class DriftEntryLocalDataSource implements EntryLocalDataSource {
   DriftEntryLocalDataSource(this.db);
   final AppDriftDatabase db;
