@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:scheck/injection.dart';
 
 class AppBlocObserver extends BlocObserver {
@@ -27,6 +28,13 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   };
 
   Bloc.observer = const AppBlocObserver();
+
+
+  // Initialize Supabase first
+  await Supabase.initialize(
+    url: 'https://gsyadwijnbcrtbavxjpm.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzeWFkd2lqbmJjcnRiYXZ4anBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MzY4OTIsImV4cCI6MjA4NzExMjg5Mn0.A-vOcIKZik58bA4tXlO3wYmtPFy0lCl1YGgG2XpSCJU',
+  );
 
   // Add cross-flavor configuration here
   configureDependencies();

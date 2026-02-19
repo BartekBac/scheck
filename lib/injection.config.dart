@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:scheck/core/services/supabase_service.dart' as _i534;
 import 'package:scheck/features/entries/data/datasources/drift/app_drift_database.dart'
     as _i112;
 import 'package:scheck/features/entries/data/datasources/drift/drift_entry_local_data_source.dart'
@@ -21,8 +22,8 @@ import 'package:scheck/features/entries/data/datasources/entry_remote_data_sourc
     as _i459;
 import 'package:scheck/features/entries/data/datasources/sqflite/sqflite_database.dart'
     as _i57;
-import 'package:scheck/features/entries/data/datasources/supabase/entry_remote_data_source_mock.dart'
-    as _i481;
+import 'package:scheck/features/entries/data/datasources/supabase/entry_remote_data_source_supabase.dart'
+    as _i799;
 import 'package:scheck/features/entries/data/repositories/entry_repository_impl.dart'
     as _i160;
 import 'package:scheck/features/entries/domain/repositories/entry_repository.dart'
@@ -53,6 +54,7 @@ import 'package:scheck/features/settings/domain/usecases/save_settings.dart'
     as _i677;
 import 'package:scheck/features/settings/presentation/bloc/settings_bloc.dart'
     as _i685;
+import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -61,16 +63,27 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final supabaseModule = _$SupabaseModule();
     gh.factory<_i112.AppDriftDatabase>(() => _i112.AppDriftDatabase());
+    gh.lazySingleton<_i454.SupabaseClient>(() => supabaseModule.supabaseClient);
     gh.lazySingleton<_i57.SqfliteDatabase>(() => _i57.SqfliteDatabase());
     gh.lazySingleton<_i637.SettingsLocalDataSource>(
       () => _i637.SettingsLocalDataSource(),
     );
-    gh.lazySingleton<_i459.EntryRemoteDataSource>(
-      () => _i481.EntryRemoteDataSourceMock(),
-    );
     gh.lazySingleton<_i583.EntryLocalDataSource>(
       () => _i962.DriftEntryLocalDataSource(gh<_i112.AppDriftDatabase>()),
+    );
+    gh.factory<_i1000.SettingsRepository>(
+      () => _i844.SettingsRepositoryImpl(gh<_i637.SettingsLocalDataSource>()),
+    );
+    gh.lazySingleton<_i65.GetSettings>(
+      () => _i65.GetSettings(gh<_i1000.SettingsRepository>()),
+    );
+    gh.lazySingleton<_i677.SaveSettings>(
+      () => _i677.SaveSettings(gh<_i1000.SettingsRepository>()),
+    );
+    gh.lazySingleton<_i459.EntryRemoteDataSource>(
+      () => _i799.EntryRemoteDataSourceSupabase(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i59.EntryRepository>(
       () => _i160.EntryRepositoryImpl(
@@ -78,8 +91,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i459.EntryRemoteDataSource>(),
       ),
     );
-    gh.factory<_i1000.SettingsRepository>(
-      () => _i844.SettingsRepositoryImpl(gh<_i637.SettingsLocalDataSource>()),
+    gh.factory<_i685.SettingsBloc>(
+      () =>
+          _i685.SettingsBloc(gh<_i65.GetSettings>(), gh<_i677.SaveSettings>()),
     );
     gh.factory<_i292.AddEntry>(
       () => _i292.AddEntry(gh<_i59.EntryRepository>()),
@@ -89,12 +103,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i891.WatchEntries>(
       () => _i891.WatchEntries(gh<_i59.EntryRepository>()),
-    );
-    gh.lazySingleton<_i65.GetSettings>(
-      () => _i65.GetSettings(gh<_i1000.SettingsRepository>()),
-    );
-    gh.lazySingleton<_i677.SaveSettings>(
-      () => _i677.SaveSettings(gh<_i1000.SettingsRepository>()),
     );
     gh.factory<_i955.GetEntries>(
       () => _i955.GetEntries(gh<_i59.EntryRepository>()),
@@ -113,10 +121,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i955.SymptomRegistrationBloc>(
       () => _i955.SymptomRegistrationBloc(addEntry: gh<_i292.AddEntry>()),
     );
-    gh.factory<_i685.SettingsBloc>(
-      () =>
-          _i685.SettingsBloc(gh<_i65.GetSettings>(), gh<_i677.SaveSettings>()),
-    );
     return this;
   }
 }
+
+class _$SupabaseModule extends _i534.SupabaseModule {}
