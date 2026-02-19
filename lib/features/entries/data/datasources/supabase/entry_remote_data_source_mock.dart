@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/features/entries/data/datasources/entry_remote_data_source.dart';
 import 'package:scheck/features/entries/data/datasources/supabase/entry_change.dart';
 import 'package:scheck/features/entries/data/models/entry_model.dart';
 
-@LazySingleton(as: EntryRemoteDataSource)
 class EntryRemoteDataSourceMock implements EntryRemoteDataSource {
   final List<EntryModel> _mockEntries = [
     EntryModel(

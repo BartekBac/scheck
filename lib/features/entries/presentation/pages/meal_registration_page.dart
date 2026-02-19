@@ -6,6 +6,7 @@ import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/presentation/widgets/meal_registration_form.dart';
 import 'package:scheck/injection.dart';
 import 'package:scheck/l10n/gen/app_localizations.dart';
+import 'dart:developer' as developer;
 
 class MealRegistrationPage extends StatelessWidget {
   const MealRegistrationPage({super.key});
@@ -85,6 +86,7 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       // reset state
       emit(const MealRegistrationState());
     } catch (e) {
+      developer.log(e.toString());
       emit(state.copyWith(status: MealRegistrationStatus.error, error: MealRegistrationError.saveError));
     }
   }

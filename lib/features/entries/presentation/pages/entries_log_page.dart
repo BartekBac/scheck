@@ -43,13 +43,18 @@ class EntriesLogPage extends StatelessWidget {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: state.entries.length,
-            itemBuilder: (context, index) {
-              final entry = state.entries[index];
-              return EntryCard(entry: entry);
+          return RefreshIndicator(
+            onRefresh: () async {
+                context.read<EntryBloc>().add(LoadEntries());
             },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.entries.length,
+              itemBuilder: (context, index) {
+                final entry = state.entries[index];
+                return EntryCard(entry: entry);
+              },
+            ),
           );
         }
         return const SizedBox.shrink();

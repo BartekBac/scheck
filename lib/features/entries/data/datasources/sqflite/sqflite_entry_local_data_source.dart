@@ -6,7 +6,7 @@ import 'package:scheck/features/entries/data/datasources/sqflite/sqflite_databas
 import 'package:sqflite/sqflite.dart';
 import 'package:scheck/features/entries/data/models/entry_model.dart';
 
-@LazySingleton(as: EntryLocalDataSource)
+//@LazySingleton(as: EntryLocalDataSource)
 class SqfliteEntryLocalDataSource implements EntryLocalDataSource {
 
   SqfliteEntryLocalDataSource(this.sDb) {

@@ -26,51 +26,53 @@ class SettingsPage extends StatelessWidget {
 
           final settings = state.settings!;
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Language Selector
-                Text(l10n.titleLanguage, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  value: settings.locale,
-                  items: [
-                    DropdownMenuItem(value: 'en', child: Text(l10n.languageEnglish)),
-                    DropdownMenuItem(value: 'es', child: Text(l10n.languageSpanish)),
-                  ],
-                  onChanged: (locale) {
-                    if (locale != null) {
-                      context.read<SettingsBloc>().add(SettingsEvent.changeLanguage(locale));
-                    }
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Language Selector
+                  Text(l10n.titleLanguage, style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: settings.locale,
+                    items: [
+                      DropdownMenuItem(value: 'en', child: Text(l10n.languageEnglish)),
+                      DropdownMenuItem(value: 'es', child: Text(l10n.languageSpanish)),
+                    ],
+                    onChanged: (locale) {
+                      if (locale != null) {
+                        context.read<SettingsBloc>().add(SettingsEvent.changeLanguage(locale));
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                // Primary Color Selector
-                Text(l10n.titlePrimaryColor, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: [Colors.indigo, Colors.deepPurple, Colors.teal, Colors.amber, Colors.blueAccent, Colors.blueGrey, Colors.green, Colors.lime].map((color) {
-                    return GestureDetector(
-                      onTap: () {
-                        context.read<SettingsBloc>().add(SettingsEvent.changePrimaryColor(color.value));
-                      },
-                      child: CircleAvatar(
-                        backgroundColor: color,
-                        child: settings.primaryColor == color.value
-                            ? const Icon(Icons.check, color: Colors.white)
-                            : null,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
+                  // Primary Color Selector
+                  Text(l10n.titlePrimaryColor, style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [Colors.indigo, Colors.deepPurple, Colors.teal, Colors.amber, Colors.blueAccent, Colors.blueGrey, Colors.green, Colors.lime].map((color) {
+                      return GestureDetector(
+                        onTap: () {
+                          context.read<SettingsBloc>().add(SettingsEvent.changePrimaryColor(color.value));
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: color,
+                          child: settings.primaryColor == color.value
+                              ? const Icon(Icons.check, color: Colors.white)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
             ),
           );
         },

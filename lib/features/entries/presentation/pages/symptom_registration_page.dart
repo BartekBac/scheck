@@ -6,6 +6,7 @@ import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/presentation/widgets/symptom_registration_form.dart';
 import 'package:scheck/injection.dart';
 import 'package:scheck/l10n/l10n.dart';
+import 'dart:developer' as developer;
 
 class SymptomRegistrationPage extends StatelessWidget {
   const SymptomRegistrationPage({super.key});
@@ -83,6 +84,7 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
       // reset state
       emit(const SymptomRegistrationState());
     } catch (e) {
+      developer.log(e.toString());
       emit(state.copyWith(status: SymptomRegistrationStatus.error, error: SymptomRegistrationError.saveError));
     }
   }
