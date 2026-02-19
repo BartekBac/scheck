@@ -26,7 +26,7 @@ dependencies:
   injectable: ^2.7.1+4
   intl: ^0.20.2
   json_annotation: ^4.10.0
-  drift: ^2.30.1
+  drift: ^2.31.0
   isar: ^3.1.0+1
   drift_flutter: ^0.2.8
   sqlite3_flutter_libs: ^0.5.41
