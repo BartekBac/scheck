@@ -8,6 +8,7 @@ part of 'entry_model.dart';
 
 EntryModel _$EntryModelFromJson(Map<String, dynamic> json) => EntryModel(
   id: json['id'] as String,
+  userId: json['userId'] as String,
   timestamp: (json['timestamp'] as num).toInt(),
   type: json['type'] as String,
   data: json['data'] as String,
@@ -17,6 +18,7 @@ EntryModel _$EntryModelFromJson(Map<String, dynamic> json) => EntryModel(
 Map<String, dynamic> _$EntryModelToJson(EntryModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'userId': instance.userId,
       'timestamp': instance.timestamp,
       'type': instance.type,
       'data': instance.data,

@@ -24,6 +24,7 @@ class DriftEntryLocalDataSource implements EntryLocalDataSource {
           .map(
             (row) => EntryModel(
               id: row.id,
+              userId: row.userId,
               timestamp: row.timestamp,
               type: row.type,
               data: row.data,
@@ -60,6 +61,7 @@ class DriftEntryLocalDataSource implements EntryLocalDataSource {
   EntriesCompanion _toCompanion(EntryModel e) {
     return EntriesCompanion.insert(
       id: e.id,
+      userId: e.userId,
       timestamp: e.timestamp,
       type: e.type,
       data: e.data,

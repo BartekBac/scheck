@@ -6,27 +6,30 @@ import 'package:scheck/core/utils/icon_facade.dart';
 
 abstract class Entry extends Equatable {
   final String id;
+  final String userId;
   final DateTime timestamp;
   final String? description;
   
   const Entry({
     required this.id,
+    required this.userId,
     required this.timestamp,
     this.description,
   });
 
   @override
-  List<Object?> get props => [id, timestamp, description];
+  List<Object?> get props => [id, userId, timestamp, description];
 }
 
 class MealEntry extends Entry {
-  final String imageUrl;
+  final String imageUrl; //TODO: move image save on remote database
   final MealType mealType;
   final List<String> ingredients;
   final Mood? moodBeforeMeal;
 
   const MealEntry({
     required super.id,
+    required super.userId,
     required super.timestamp,
     required this.imageUrl,
     required this.mealType,
@@ -36,7 +39,7 @@ class MealEntry extends Entry {
   });
 
   @override
-  List<Object?> get props => [id, timestamp, description, imageUrl, mealType, ingredients, moodBeforeMeal];
+  List<Object?> get props => [id, userId, timestamp, description, imageUrl, mealType, ingredients, moodBeforeMeal];
 }
 
 class SymptomEntry extends Entry {
@@ -45,6 +48,7 @@ class SymptomEntry extends Entry {
 
   const SymptomEntry({
     required super.id,
+    required super.userId,
     required super.timestamp,
     required this.symptoms,
     required this.symptomIntensities,
@@ -52,7 +56,7 @@ class SymptomEntry extends Entry {
   });
 
   @override
-  List<Object?> get props => [id, timestamp, description, symptoms, symptomIntensities];
+  List<Object?> get props => [id, userId, timestamp, description, symptoms, symptomIntensities];
 }
 
 enum MealType {

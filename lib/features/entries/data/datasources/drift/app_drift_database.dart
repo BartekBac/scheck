@@ -7,13 +7,12 @@ import 'package:scheck/features/entries/data/datasources/drift/tables//entries.d
 part 'app_drift_database.g.dart';
 
 QueryExecutor _openConnection() {
-  // Drift sam zadba o otwarcie bazy SQLite
   return driftDatabase(
     name: 'app_db.sqlite',
     native: const DriftNativeOptions(
-      databaseDirectory: getApplicationDocumentsDirectory, // dokumenty
+      databaseDirectory: getApplicationDocumentsDirectory,
     ),
-    // Opcje web jeśli budujesz także na web
+
     web: DriftWebOptions(
       sqlite3Wasm: Uri.parse('sqlite3.wasm'),
       driftWorker: Uri.parse('drift_worker.js'),

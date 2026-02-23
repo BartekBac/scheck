@@ -22,6 +22,16 @@ class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
       schema: 'public',
       table: _tableName,
       callback: (payload) {
+        final currentUser = _client.auth.currentUser;
+        if (currentUser == null) return;
+        
+        final record = payload.eventType == PostgresChangeEvent.delete 
+            ? payload.oldRecord 
+            : payload.newRecord;
+            
+        final recordUserId = record['user_id'] as String?;
+        if (recordUserId != currentUser.id) return;
+        
         switch (payload.eventType) {
           case PostgresChangeEvent.insert:
             final entry = EntryModel.fromMap(payload.newRecord);
@@ -45,9 +55,15 @@ class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
   @override
   Future<List<EntryModel>> fetchAll() async {
     try {
+      final currentUser = _client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('User not authenticated');
+      }
+      
       final response = await _client
           .from(_tableName)
           .select()
+          .eq('user_id', currentUser.id)
           .order('timestamp', ascending: false);
 
       return (response as List<dynamic>)
@@ -61,6 +77,11 @@ class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
   @override
   Future<void> insert(EntryModel entry) async {
     try {
+      final currentUser = _client.auth.currentUser;
+      if (currentUser == null || currentUser.id != entry.userId) {
+        throw Exception('User not authenticated');
+      }
+
       await _client.from(_tableName).insert(entry.toMap());
     } catch (e) {
       throw Exception('Failed to insert entry: $e');
@@ -70,7 +91,16 @@ class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
   @override
   Future<void> delete(String id) async {
     try {
-      await _client.from(_tableName).delete().eq('id', id);
+      final currentUser = _client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('User not authenticated');
+      }
+      
+      await _client
+          .from(_tableName)
+          .delete()
+          .eq('id', id)
+          .eq('user_id', currentUser.id);
     } catch (e) {
       throw Exception('Failed to delete entry: $e');
     }

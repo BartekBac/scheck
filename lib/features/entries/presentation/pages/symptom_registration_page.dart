@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/presentation/widgets/symptom_registration_form.dart';
 import 'package:scheck/injection.dart';
-import 'package:scheck/l10n/l10n.dart';
 import 'dart:developer' as developer;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SymptomRegistrationPage extends StatelessWidget {
   const SymptomRegistrationPage({super.key});
@@ -23,8 +24,9 @@ class SymptomRegistrationPage extends StatelessWidget {
 @injectable
 class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegistrationState> {
   final AddEntry addEntry;
+  final SupabaseClient supabaseClient;
 
-  SymptomRegistrationBloc({required this.addEntry})
+  SymptomRegistrationBloc({required this.addEntry, required this.supabaseClient})
       : super(const SymptomRegistrationState()) {
     on<SelectSymptoms>(_onSelectSymptoms);
     on<UpdateSymptomIntensity>(_onUpdateSymptomIntensity);
@@ -74,6 +76,7 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
     try {
       final entry = SymptomEntry(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: supabaseClient.auth.currentUser?.id ?? '',
         timestamp: DateTime.now(),
         symptoms: state.selectedSymptoms,
         symptomIntensities: state.symptomIntensities,
@@ -85,7 +88,7 @@ class SymptomRegistrationBloc extends Bloc<SymptomRegistrationEvent, SymptomRegi
       emit(const SymptomRegistrationState());
     } catch (e) {
       developer.log(e.toString());
-      emit(state.copyWith(status: SymptomRegistrationStatus.error, error: SymptomRegistrationError.saveError));
+      emit(state.copyWith(status: SymptomRegistrationStatus.error, error: MessageFacade.symptomSaveError));
     }
   }
 }
@@ -113,22 +116,12 @@ class UpdateDescription extends SymptomRegistrationEvent {
 
 class SubmitSymptoms extends SymptomRegistrationEvent {}
 
-enum SymptomRegistrationError {
-  saveError
-}
-
-extension SymptomRegistrationErrorExtension on SymptomRegistrationError {
-  String getMessage(AppLocalizations l10n) => switch(this) {
-    SymptomRegistrationError.saveError => l10n.errorFailedToSaveSymptoms
-  };
-}
-
 @immutable
 class SymptomRegistrationState {
   final List<String> selectedSymptoms;
   final Map<String, int> symptomIntensities;
   final String? description;
-  final SymptomRegistrationError? error;
+  final MessageFacade? error;
   final SymptomRegistrationStatus status;
 
   bool get readyToSave => selectedSymptoms.isNotEmpty;
@@ -145,7 +138,7 @@ class SymptomRegistrationState {
     List<String>? selectedSymptoms,
     Map<String, int>? symptomIntensities,
     String? description,
-    SymptomRegistrationError? error,
+    MessageFacade? error,
     SymptomRegistrationStatus? status,
   }) {
     return SymptomRegistrationState(

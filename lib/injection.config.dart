@@ -12,6 +12,18 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:scheck/core/services/supabase_service.dart' as _i534;
+import 'package:scheck/features/auth/data/datasources/supabase_auth_datasource.dart'
+    as _i851;
+import 'package:scheck/features/auth/data/repositories/auth_repository_impl.dart'
+    as _i401;
+import 'package:scheck/features/auth/domain/repositories/auth_repository.dart'
+    as _i352;
+import 'package:scheck/features/auth/domain/usecases/get_current_user.dart'
+    as _i520;
+import 'package:scheck/features/auth/domain/usecases/sign_in.dart' as _i843;
+import 'package:scheck/features/auth/domain/usecases/sign_out.dart' as _i449;
+import 'package:scheck/features/auth/domain/usecases/sign_up.dart' as _i818;
+import 'package:scheck/features/auth/presentation/bloc/auth_bloc.dart' as _i318;
 import 'package:scheck/features/entries/data/datasources/drift/app_drift_database.dart'
     as _i112;
 import 'package:scheck/features/entries/data/datasources/drift/drift_entry_local_data_source.dart'
@@ -73,6 +85,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i583.EntryLocalDataSource>(
       () => _i962.DriftEntryLocalDataSource(gh<_i112.AppDriftDatabase>()),
     );
+    gh.lazySingleton<_i851.AuthDataSource>(
+      () => _i851.SupabaseAuthDataSource(gh<_i454.SupabaseClient>()),
+    );
     gh.factory<_i1000.SettingsRepository>(
       () => _i844.SettingsRepositoryImpl(gh<_i637.SettingsLocalDataSource>()),
     );
@@ -84,6 +99,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i459.EntryRemoteDataSource>(
       () => _i799.EntryRemoteDataSourceSupabase(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i352.AuthRepository>(
+      () => _i401.AuthRepositoryImpl(gh<_i851.AuthDataSource>()),
     );
     gh.lazySingleton<_i59.EntryRepository>(
       () => _i160.EntryRepositoryImpl(
@@ -104,6 +122,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i891.WatchEntries>(
       () => _i891.WatchEntries(gh<_i59.EntryRepository>()),
     );
+    gh.factory<_i520.GetCurrentUser>(
+      () => _i520.GetCurrentUser(gh<_i352.AuthRepository>()),
+    );
+    gh.factory<_i843.SignIn>(() => _i843.SignIn(gh<_i352.AuthRepository>()));
+    gh.factory<_i449.SignOut>(() => _i449.SignOut(gh<_i352.AuthRepository>()));
+    gh.factory<_i818.SignUp>(() => _i818.SignUp(gh<_i352.AuthRepository>()));
     gh.factory<_i955.GetEntries>(
       () => _i955.GetEntries(gh<_i59.EntryRepository>()),
     );
@@ -115,11 +139,26 @@ extension GetItInjectableX on _i174.GetIt {
         watchEntries: gh<_i891.WatchEntries>(),
       ),
     );
+    gh.factory<_i318.AuthBloc>(
+      () => _i318.AuthBloc(
+        gh<_i352.AuthRepository>(),
+        gh<_i843.SignIn>(),
+        gh<_i818.SignUp>(),
+        gh<_i449.SignOut>(),
+        gh<_i520.GetCurrentUser>(),
+      ),
+    );
     gh.factory<_i671.MealRegistrationBloc>(
-      () => _i671.MealRegistrationBloc(addEntry: gh<_i292.AddEntry>()),
+      () => _i671.MealRegistrationBloc(
+        addEntry: gh<_i292.AddEntry>(),
+        supabaseClient: gh<_i454.SupabaseClient>(),
+      ),
     );
     gh.factory<_i955.SymptomRegistrationBloc>(
-      () => _i955.SymptomRegistrationBloc(addEntry: gh<_i292.AddEntry>()),
+      () => _i955.SymptomRegistrationBloc(
+        addEntry: gh<_i292.AddEntry>(),
+        supabaseClient: gh<_i454.SupabaseClient>(),
+      ),
     );
     return this;
   }
