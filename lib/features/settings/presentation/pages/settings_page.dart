@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scheck/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:scheck/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:scheck/l10n/l10n.dart';
 
@@ -70,6 +71,24 @@ class SettingsPage extends StatelessWidget {
                         ),
                       );
                     }).toList(),
+                  ),
+                  const SizedBox(height: 24),
+                  //TODO: make SignOut button better fitted
+                  // Sign Out Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(const AuthEvent.signOutRequested());
+                        Navigator.of(context).pushReplacementNamed('/sign_in');
+                      },
+                      icon: const Icon(Icons.logout),
+                      label: Text('Sign Out'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),

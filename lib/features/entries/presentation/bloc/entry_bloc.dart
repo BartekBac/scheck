@@ -6,6 +6,7 @@ import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/delete_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/get_entries.dart';
 import 'package:scheck/features/entries/domain/usecases/watch_entries.dart';
+import 'dart:developer' as developer;
 
 part 'entry_event.dart';
 part 'entry_state.dart';
@@ -30,7 +31,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
     on<DeleteEntryEvent>(_onDeleteEntry);
     on<EntriesSubscriptionRequested>(_onSubscriptionRequested);
   }
-
+  //TODO: refactor error messages
   Future<void> _onSubscriptionRequested(
       EntriesSubscriptionRequested event,
       Emitter<EntryState> emit,
@@ -39,7 +40,10 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
     await emit.onEach<List<Entry>>(
       watchEntries(),
       onData: (entries) => emit(EntryLoaded(entries)),
-      onError: (error, stackTrace) => emit(EntryError('Failed to load entries: $error')),
+      onError: (error, stackTrace) {
+        developer.log('Failed to load entries.', error: error, stackTrace: stackTrace);
+        emit(EntryError('Failed to load entries: $error'));
+      },
     );
   }
 
@@ -49,6 +53,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       final entries = await getEntries();
       emit(EntryLoaded(entries));
     } catch (e) {
+      developer.log('Failed to load entries.', error: e);
       emit(EntryError('Failed to load entries: $e'));
     }
   }
@@ -58,6 +63,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
     try {
       await addEntry.call(event.entry);
     } catch (e) {
+      developer.log('Failed to add entry.', error: e);
       emit(EntryError('Failed to add entry: $e'));
     }
   }
@@ -66,6 +72,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
     try {
       await deleteEntry.call(event.entry);
     } catch (e) {
+      developer.log('Failed to delete entry.', error: e);
       emit(EntryError('Failed to delete entry: $e'));
     }
   }

@@ -29,14 +29,26 @@ class DialogHandler {
     ) ?? false;
   }
 
-  static void showSnackBar(BuildContext context, {required String message, Color? backgroundColor}) {
-    backgroundColor ??= ColorStyler.Error.color(context);
+  static void showSnackBar(BuildContext context, {required String message, Color? backgroundColor, bool immediate = false}) {
+    backgroundColor ??= ColorStyler.Primary.color(context);
+    if(immediate) {
+      clearSnackBar(context);
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text(message),
         backgroundColor: backgroundColor,
+
       ),
     );
+  }
+
+  static void clearSnackBar(BuildContext context, {bool slow = false, SnackBarClosedReason? reason}) {
+    final closedReason = reason ?? SnackBarClosedReason.action;
+    if(slow) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar(reason: closedReason);
+    }
+    ScaffoldMessenger.of(context).removeCurrentSnackBar(reason: closedReason);
   }
 }

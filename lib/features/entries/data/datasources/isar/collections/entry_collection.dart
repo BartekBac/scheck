@@ -7,6 +7,7 @@ class EntryCollection {
   @Index(unique: true)
   late String entryId;
   @Index()
+  late String userId;
   late int timestamp;
   late String type;
   late String data;

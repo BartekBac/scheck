@@ -18,42 +18,60 @@ class EntriesLogPage extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (state is EntryError) {
+          //TODO: improve page refreshes
           return Center(child: Text(context.l10n.errorFailedToLoadEntries));
         }
         if (state is EntryLoaded) {
-          if (state.entries.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(IconFacade.empty, size: 64, color: ColorStyler.Surface.onColor(context)),
-                  const SizedBox(height: 16),
-                  Text(
-                    context.l10n.pageEntriesLogNoEntriesTitle,
-                    style: TextStyler.Headline.medium(context),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.l10n.pageEntriesLogNoEntriesHint,
-                    style: TextStyler.Body.medium(context),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
+          return Container(
+            child: RefreshIndicator(
+              backgroundColor: ColorStyler.SecondaryContainer.onColor(context),
+              onRefresh: () async {
                 context.read<EntryBloc>().add(LoadEntries());
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: state.entries.length,
-              itemBuilder: (context, index) {
-                final entry = state.entries[index];
-                return EntryCard(entry: entry);
               },
+              child: state.entries.isEmpty
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: constraints.maxHeight,
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    IconFacade.empty,
+                                    size: 64,
+                                    color: ColorStyler.Surface.onColor(context),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    context.l10n.pageEntriesLogNoEntriesTitle,
+                                    style: TextStyler.Headline.medium(context),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    context.l10n.pageEntriesLogNoEntriesHint,
+                                    style: TextStyler.Body.medium(context),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: state.entries.length,
+                      itemBuilder: (context, index) {
+                        final entry = state.entries[index];
+                        return EntryCard(entry: entry);
+                      },
+                    ),
             ),
           );
         }

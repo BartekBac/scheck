@@ -7,6 +7,7 @@ part 'entry_model.g.dart';
 @JsonSerializable()
 class EntryModel {
   final String id;
+  final String userId;
   final int timestamp;
   final String type;
   final String data;
@@ -14,6 +15,7 @@ class EntryModel {
 
   EntryModel({
     required this.id,
+    required this.userId,
     required this.timestamp,
     required this.type,
     required this.data,
@@ -23,6 +25,7 @@ class EntryModel {
   factory EntryModel.fromMap(Map<String, dynamic> map) {
     return EntryModel(
       id: map['id'] as String,
+      userId: map['user_id'] as String,
       timestamp: map['timestamp'] as int,
       type: map['type'] as String,
       data: map['data'] as String,
@@ -33,6 +36,7 @@ class EntryModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'timestamp': timestamp,
       'type': type,
       'data': data,
@@ -64,6 +68,7 @@ class EntryModel {
     
     return EntryModel(
       id: entry.id,
+      userId: entry.userId,
       timestamp: entry.timestamp.millisecondsSinceEpoch,
       type: type,
       data: data,
@@ -84,6 +89,7 @@ extension EntryModelExtension on EntryModel {
         final mealData = MealData.fromJson(jsonDecode(data) as Map<String, dynamic>);
         return MealEntry(
           id: id,
+          userId: userId,
           timestamp: DateTime.fromMillisecondsSinceEpoch(timestamp),
           imageUrl: mealData.imageUrl,
           mealType: MealType.values.byName(mealData.mealType),
@@ -95,6 +101,7 @@ extension EntryModelExtension on EntryModel {
         final symptomData = SymptomData.fromJson(jsonDecode(data) as Map<String, dynamic>);
         return SymptomEntry(
           id: id,
+          userId: userId,
           timestamp: DateTime.fromMillisecondsSinceEpoch(timestamp),
           symptoms: symptomData.symptoms,
           symptomIntensities: symptomData.symptomIntensities,

@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/presentation/widgets/meal_registration_form.dart';
 import 'package:scheck/injection.dart';
-import 'package:scheck/l10n/gen/app_localizations.dart';
 import 'dart:developer' as developer;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MealRegistrationPage extends StatelessWidget {
   const MealRegistrationPage({super.key});
@@ -23,8 +24,9 @@ class MealRegistrationPage extends StatelessWidget {
 @injectable
 class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationState> {
   final AddEntry addEntry;
+  final SupabaseClient supabaseClient;
 
-  MealRegistrationBloc({required this.addEntry})
+  MealRegistrationBloc({required this.addEntry, required this.supabaseClient})
       : super(const MealRegistrationState()) {
     on<SelectImage>(_onSelectImage);
     on<UpdateMealType>(_onUpdateMealType);
@@ -74,6 +76,7 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
     try {
       final entry = MealEntry(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: supabaseClient.auth.currentUser?.id ?? '',
         timestamp: DateTime.now(),
         imageUrl: state.imageUrl,
         mealType: state.mealType,
@@ -87,7 +90,7 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       emit(const MealRegistrationState());
     } catch (e) {
       developer.log(e.toString());
-      emit(state.copyWith(status: MealRegistrationStatus.error, error: MealRegistrationError.saveError));
+      emit(state.copyWith(status: MealRegistrationStatus.error, error: MessageFacade.mealSaveError));
     }
   }
 }
@@ -126,16 +129,6 @@ class UpdateDescription extends MealRegistrationEvent {
 
 class SubmitMeal extends MealRegistrationEvent {}
 
-enum MealRegistrationError {
-  saveError
-}
-
-extension MealRegistrationErrorExtension on MealRegistrationError {
-  String getMessage(AppLocalizations l10n) => switch(this) {
-    MealRegistrationError.saveError => l10n.errorFailedToSaveMeal
-  };
-}
-
 
 @immutable
 class MealRegistrationState {
@@ -144,7 +137,7 @@ class MealRegistrationState {
   final List<String> ingredients;
   final Mood? moodBeforeMeal;
   final String? description;
-  final MealRegistrationError? error;
+  final MessageFacade? error;
   final MealRegistrationStatus status;
 
   bool get readyToSave => imageUrl.isNotEmpty;
@@ -166,7 +159,7 @@ class MealRegistrationState {
     List<String>? ingredients,
     Mood? moodBeforeMeal,
     String? description,
-    MealRegistrationError? error,
+    MessageFacade? error,
     MealRegistrationStatus? status,
   }) {
     return MealRegistrationState(

@@ -6,30 +6,6 @@ import 'package:scheck/features/entries/data/datasources/supabase/entry_change.d
 import 'package:scheck/features/entries/data/models/entry_model.dart';
 import 'package:scheck/features/entries/domain/repositories/entry_repository.dart';
 
-/*
-class EntryRepositoryImpl implements EntryRepository {
-  final DatabaseHelper _databaseHelper;
-
-  EntryRepositoryImpl(this._databaseHelper);
-
-  @override
-  Future<List<Entry>> getEntries() async {
-    final entryModels = await _databaseHelper.getEntries();
-    return entryModels.map((model) => model.toEntity()).toList();
-  }
-
-  @override
-  Future<void> addEntry(Entry entry) async {
-    await _databaseHelper.insertEntry(EntryModel.fromEntity(entry));
-  }
-
-  @override
-  Future<void> deleteEntry(String id) async {
-    await _databaseHelper.deleteEntry(id);
-  }
-}
-*/
-
 @LazySingleton(as: EntryRepository)
 class EntryRepositoryImpl implements EntryRepository {
   final EntryLocalDataSource local;

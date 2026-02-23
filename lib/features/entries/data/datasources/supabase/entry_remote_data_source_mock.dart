@@ -10,6 +10,7 @@ class EntryRemoteDataSourceMock implements EntryRemoteDataSource {
   final List<EntryModel> _mockEntries = [
     EntryModel(
       id: '1',
+      userId: '1',
       timestamp: DateTime.now().subtract(const Duration(days: 1)).millisecondsSinceEpoch,
       type: 'meal',
       data: jsonEncode(MealData(
@@ -22,6 +23,7 @@ class EntryRemoteDataSourceMock implements EntryRemoteDataSource {
     ),
     EntryModel(
       id: '2',
+      userId: '1',
       timestamp: DateTime.now().subtract(const Duration(hours: 18)).millisecondsSinceEpoch,
       type: 'symptom',
       data: jsonEncode(SymptomData(
@@ -32,6 +34,7 @@ class EntryRemoteDataSourceMock implements EntryRemoteDataSource {
     ),
     EntryModel(
       id: '3',
+      userId: '1',
       timestamp: DateTime.now().subtract(const Duration(hours: 10)).millisecondsSinceEpoch,
       type: 'meal',
       data: jsonEncode(MealData(
@@ -44,6 +47,7 @@ class EntryRemoteDataSourceMock implements EntryRemoteDataSource {
     ),
     EntryModel(
       id: '4',
+      userId: '1',
       timestamp: DateTime.now().subtract(const Duration(hours: 1)).millisecondsSinceEpoch,
       type: 'symptom',
       data: jsonEncode(SymptomData(

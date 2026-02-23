@@ -5,6 +5,7 @@ import 'package:scheck/core/stylers/color_styler.dart';
 import 'package:scheck/core/stylers/shape_styler.dart';
 import 'package:scheck/core/stylers/text_styler.dart';
 import 'package:scheck/core/utils/error_handler.dart';
+import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/core/widgets/section_title.dart';
 import 'package:scheck/core/widgets/submit_button.dart';
 import 'package:scheck/features/entries/presentation/pages/symptom_registration_page.dart';
