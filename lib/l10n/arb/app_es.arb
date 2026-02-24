@@ -28,6 +28,8 @@
     "errorFailedToLoadSettings": "Error al cargar la configuración.",
     "errorFailedToSaveMeal": "Error al guardar la comida.",
     "errorFailedToSaveSymptoms": "Error al guardar los síntomas.",
+    "errorFailedToAddEntry": "Error al añadir la entrada.",
+    "errorFailedToDeleteEntry": "Error al eliminar la entrada.",
     "errorGalleryNotAvailable": "Galería no disponible.",
     "errorCameraNotAvailable": "Cámara no disponible. Usa la galería en su lugar.",
     "errorSignIn": "Error al iniciar sesión. Por favor, verifica tu correo y contraseña.",

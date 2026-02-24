@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/delete_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/get_entries.dart';
@@ -31,7 +32,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
     on<DeleteEntryEvent>(_onDeleteEntry);
     on<EntriesSubscriptionRequested>(_onSubscriptionRequested);
   }
-  //TODO: refactor error messages
+
   Future<void> _onSubscriptionRequested(
       EntriesSubscriptionRequested event,
       Emitter<EntryState> emit,
@@ -42,7 +43,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       onData: (entries) => emit(EntryLoaded(entries)),
       onError: (error, stackTrace) {
         developer.log('Failed to load entries.', error: error, stackTrace: stackTrace);
-        emit(EntryError('Failed to load entries: $error'));
+        emit(const EntryError(MessageFacade.loadEntriesError));
       },
     );
   }
@@ -54,7 +55,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       emit(EntryLoaded(entries));
     } catch (e) {
       developer.log('Failed to load entries.', error: e);
-      emit(EntryError('Failed to load entries: $e'));
+      emit(const EntryError(MessageFacade.loadEntriesError));
     }
   }
 
@@ -64,7 +65,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       await addEntry.call(event.entry);
     } catch (e) {
       developer.log('Failed to add entry.', error: e);
-      emit(EntryError('Failed to add entry: $e'));
+      emit(const EntryError(MessageFacade.addEntryError));
     }
   }
 
@@ -73,7 +74,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       await deleteEntry.call(event.entry);
     } catch (e) {
       developer.log('Failed to delete entry.', error: e);
-      emit(EntryError('Failed to delete entry: $e'));
+      emit(const EntryError(MessageFacade.deleteEntryError));
     }
   }
 

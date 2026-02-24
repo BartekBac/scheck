@@ -6,6 +6,9 @@ enum MessageFacade {
   signInError,
   signUpError,
   unexpectedError,
+  loadEntriesError,
+  addEntryError,
+  deleteEntryError,
 }
 
 extension MessageFacadeExtension on MessageFacade {
@@ -14,6 +17,9 @@ extension MessageFacadeExtension on MessageFacade {
     MessageFacade.symptomSaveError => l10n.errorFailedToSaveSymptoms,
     MessageFacade.signInError => l10n.errorSignIn,
     MessageFacade.signUpError => l10n.errorSignUp,
-    MessageFacade.unexpectedError => l10n.errorUnexpected
+    MessageFacade.unexpectedError => l10n.errorUnexpected,
+    MessageFacade.loadEntriesError => l10n.errorFailedToLoadEntries,
+    MessageFacade.addEntryError => l10n.errorFailedToAddEntry,
+    MessageFacade.deleteEntryError => l10n.errorFailedToDeleteEntry,
   };
 }
