@@ -141,6 +141,7 @@
             }
         }
     },
+    "detailsDialogNoImage": "No image",
 
     "signIn": "Sign In",
     "signUp": "Sign Up",

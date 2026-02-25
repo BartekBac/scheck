@@ -51,7 +51,8 @@ class EntryModel {
     if (entry is MealEntry) {
       type = 'meal';
       data = jsonEncode(MealData(
-        imageUrl: entry.imageUrl,
+        localImageUrl: entry.localImageUrl,
+        remoteImageUrl: entry.remoteImageUrl,
         mealType: entry.mealType.name,
         ingredients: entry.ingredients,
         moodBeforeMeal: entry.moodBeforeMeal?.name,
@@ -91,7 +92,8 @@ extension EntryModelExtension on EntryModel {
           id: id,
           userId: userId,
           timestamp: DateTime.fromMillisecondsSinceEpoch(timestamp),
-          imageUrl: mealData.imageUrl,
+          localImageUrl: mealData.localImageUrl,
+          remoteImageUrl: mealData.remoteImageUrl,
           mealType: MealType.values.byName(mealData.mealType),
           ingredients: mealData.ingredients,
           moodBeforeMeal: mealData.moodBeforeMeal != null ? Mood.values.byName(mealData.moodBeforeMeal!) : null,
@@ -115,13 +117,15 @@ extension EntryModelExtension on EntryModel {
 
 @JsonSerializable()
 class MealData {
-  final String imageUrl;
+  final String? localImageUrl;
+  final String? remoteImageUrl;
   final String mealType;
   final List<String> ingredients;
   final String? moodBeforeMeal;
 
   MealData({
-    required this.imageUrl,
+    this.localImageUrl,
+    this.remoteImageUrl,
     required this.mealType,
     required this.ingredients,
     this.moodBeforeMeal,

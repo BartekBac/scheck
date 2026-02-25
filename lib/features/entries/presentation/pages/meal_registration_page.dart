@@ -88,7 +88,8 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       final userId = supabaseClient.auth.currentUser?.id ?? '';
       final entryId = DateTime.now().millisecondsSinceEpoch.toString();
 
-      final imageUrl = state.image != null
+      final localImageUrl = state.image?.path;
+      final remoteImageUrl = state.image != null
           ? await uploadImage.call(state.image!, userId, entryId)
           : imageService.emptyImageUrl;
 
@@ -96,7 +97,8 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
         id: entryId,
         userId: userId,
         timestamp: DateTime.now(),
-        imageUrl: imageUrl,
+        localImageUrl: localImageUrl,
+        remoteImageUrl: remoteImageUrl,
         mealType: state.mealType,
         ingredients: state.ingredients,
         moodBeforeMeal: state.moodBeforeMeal,

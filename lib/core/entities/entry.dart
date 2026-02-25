@@ -22,7 +22,8 @@ abstract class Entry extends Equatable {
 }
 
 class MealEntry extends Entry {
-  final String imageUrl; //TODO: add local/remote urls dualism
+  final String? localImageUrl;
+  final String? remoteImageUrl;
   final MealType mealType;
   final List<String> ingredients;
   final Mood? moodBeforeMeal;
@@ -31,7 +32,8 @@ class MealEntry extends Entry {
     required super.id,
     required super.userId,
     required super.timestamp,
-    required this.imageUrl,
+    this.localImageUrl,
+    this.remoteImageUrl,
     required this.mealType,
     required this.ingredients,
     this.moodBeforeMeal,
@@ -39,7 +41,7 @@ class MealEntry extends Entry {
   });
 
   @override
-  List<Object?> get props => [id, userId, timestamp, description, imageUrl, mealType, ingredients, moodBeforeMeal];
+  List<Object?> get props => [id, userId, timestamp, description, localImageUrl, remoteImageUrl, mealType, ingredients, moodBeforeMeal];
 }
 
 class SymptomEntry extends Entry {

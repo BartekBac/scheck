@@ -17,6 +17,7 @@ class IconFacade {
   static const IconData back = Icons.arrow_back;
 
   static const IconData settings = Icons.settings_rounded;
+  static const IconData noImage = Icons.broken_image;
 
 
 

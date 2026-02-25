@@ -64,6 +64,7 @@
     "detailsDialogMoodLabel": "Ánimo: ",
     "detailsDialogIngredientsLabel": "Ingredientes: {ingredients}",
     "detailsDialogDescriptionLabel": "Descripción: {description}",
+    "detailsDialogNoImage": "Sin imagen",
     "signIn": "Iniciar Sesión",
     "signUp": "Registrarse",
     "email": "Correo Electrónico",
