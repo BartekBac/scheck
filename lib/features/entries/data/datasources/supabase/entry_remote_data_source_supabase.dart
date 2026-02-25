@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:injectable/injectable.dart';
+import 'package:scheck/core/services/image_service.dart';
 import 'package:scheck/features/entries/data/datasources/entry_remote_data_source.dart';
 import 'package:scheck/features/entries/data/datasources/supabase/entry_change.dart';
 import 'package:scheck/features/entries/data/models/entry_model.dart';
@@ -10,10 +11,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 @LazySingleton(as: EntryRemoteDataSource)
 class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
   final SupabaseClient _client;
+  final String _tableName = ImageService.tableName;
+  final String _bucketName = ImageService.bucketName;
   final StreamController<EntryChange> _controller = StreamController<EntryChange>.broadcast();
-  static const String _tableName = 'entries';
-  static const String _bucketName = 'meal-images';
-  static String emptyImageUrl() => Supabase.instance.client.storage.from(_bucketName).getPublicUrl('$_bucketName/empty-meal.jpg');
   static String imageStoragePath(String bucketName, String userId, String entryId) => '$bucketName/$userId/$entryId.jpg';
 
   EntryRemoteDataSourceSupabase(this._client) {
@@ -78,7 +78,6 @@ class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
     }
   }
 
-  //TODO: add file compression
   @override
   Future<String> uploadImage(File image, String userId, String entryId) async {
     final String storagePath = imageStoragePath(_bucketName, userId, entryId);

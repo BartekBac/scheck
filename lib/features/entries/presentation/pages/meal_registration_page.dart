@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/services/image_service.dart';
 import 'package:scheck/core/utils/message_facade.dart';
-import 'package:scheck/features/entries/data/datasources/supabase/entry_remote_data_source_supabase.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/upload_image.dart';
 import 'package:scheck/features/entries/presentation/widgets/meal_registration_form.dart';
@@ -30,8 +30,14 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
   final AddEntry addEntry;
   final UploadImage uploadImage;
   final SupabaseClient supabaseClient;
+  final ImageService imageService;
 
-  MealRegistrationBloc({required this.addEntry, required this.uploadImage, required this.supabaseClient})
+  MealRegistrationBloc({
+    required this.addEntry,
+    required this.uploadImage,
+    required this.supabaseClient,
+    required this.imageService
+  })
       : super(const MealRegistrationState()) {
     on<SelectImage>(_onSelectImage);
     on<UpdateMealType>(_onUpdateMealType);
@@ -84,7 +90,7 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
 
       final imageUrl = state.image != null
           ? await uploadImage.call(state.image!, userId, entryId)
-          : EntryRemoteDataSourceSupabase.emptyImageUrl();
+          : imageService.emptyImageUrl;
 
       final entry = MealEntry(
         id: entryId,
