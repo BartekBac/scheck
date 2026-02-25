@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/features/entries/data/datasources/entry_local_data_source.dart';
@@ -62,5 +64,15 @@ class EntryRepositoryImpl implements EntryRepository {
           await local.delete(id);
       }
     });
+  }
+
+  @override
+  Future<String> uploadImage(File image, String userId, String entryId) async {
+    return remote.uploadImage(image, userId, entryId);
+  }
+
+  @override
+  Future<void> deleteImage(String userId, String entryId) async {
+    return remote.deleteImage(userId, entryId);
   }
 }

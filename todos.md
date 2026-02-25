@@ -5,7 +5,7 @@
 4. Add AI capabilities to interpret images in MealRegistrationPage
 
 # Ongoing TODOs
-1. move image save on remote database
+1. add image compression before upload and local/remote url dualism
 2. make SignOut button better fitted
 
 # Test Creds

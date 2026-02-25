@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -5,7 +7,9 @@ import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/delete_entry.dart';
+import 'package:scheck/features/entries/domain/usecases/delete_image.dart';
 import 'package:scheck/features/entries/domain/usecases/get_entries.dart';
+import 'package:scheck/features/entries/domain/usecases/upload_image.dart';
 import 'package:scheck/features/entries/domain/usecases/watch_entries.dart';
 import 'dart:developer' as developer;
 
@@ -20,16 +24,21 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
   final AddEntry addEntry;
   final DeleteEntry deleteEntry;
   final WatchEntries watchEntries;
+  final UploadImage uploadImage;
+  final DeleteImage deleteImage;
 
   EntryBloc({
     required this.getEntries,
     required this.addEntry,
     required this.deleteEntry,
     required this.watchEntries,
+    required this.uploadImage,
+    required this.deleteImage
   }) : super(EntryInitial()) {
     on<LoadEntries>(_onLoadEntries);
     on<AddEntryEvent>(_onAddEntry);
     on<DeleteEntryEvent>(_onDeleteEntry);
+    on<UploadImageEvent>(_onUploadImage);
     on<EntriesSubscriptionRequested>(_onSubscriptionRequested);
   }
 
@@ -59,7 +68,6 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
     }
   }
 
-
   Future<void> _onAddEntry(AddEntryEvent event, Emitter<EntryState> emit) async {
     try {
       await addEntry.call(event.entry);
@@ -72,10 +80,20 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
   Future<void> _onDeleteEntry(DeleteEntryEvent event, Emitter<EntryState> emit) async {
     try {
       await deleteEntry.call(event.entry);
+      await deleteImage.call(event.entry.userId, event.entry.id);
     } catch (e) {
       developer.log('Failed to delete entry.', error: e);
       emit(const EntryError(MessageFacade.deleteEntryError));
     }
   }
 
+  Future<String?> _onUploadImage(UploadImageEvent event, Emitter<EntryState> emit) async {
+    try {
+      return await uploadImage.call(event.image, event.userId, event.entryId);
+    } catch (e) {
+      developer.log('Failed to add entry.', error: e);
+      emit(const EntryError(MessageFacade.addEntryError));
+      return null;
+    }
+  }
 }

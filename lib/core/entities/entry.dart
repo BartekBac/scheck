@@ -22,7 +22,7 @@ abstract class Entry extends Equatable {
 }
 
 class MealEntry extends Entry {
-  final String imageUrl; //TODO: move image save on remote database
+  final String imageUrl; //TODO: add local/remote urls dualism
   final MealType mealType;
   final List<String> ingredients;
   final Mood? moodBeforeMeal;

@@ -61,7 +61,7 @@ class MealRegistrationForm extends StatelessWidget {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: source);
     if (image != null) {
-      bloc.add(SelectImage(image.path));
+      bloc.add(SelectImage(File(image.path)));
     }
   }
 
@@ -107,7 +107,7 @@ class MealRegistrationForm extends StatelessWidget {
               borderRadius: ShapeStyler.InnerFieldShape.borderRadius,
               color: ColorStyler.SurfaceContainerLow.color(context),
             ),
-            child: state.imageUrl.isEmpty
+            child: state.image == null
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -120,7 +120,7 @@ class MealRegistrationForm extends StatelessWidget {
                 : ClipRRect(
                     borderRadius: ShapeStyler.FieldShape.borderRadius,
                     child: Image.file(
-                      File(state.imageUrl),
+                      File(state.image!.path),
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: 200,

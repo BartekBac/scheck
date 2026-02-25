@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/core/utils/message_facade.dart';
+import 'package:scheck/features/entries/data/datasources/supabase/entry_remote_data_source_supabase.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
+import 'package:scheck/features/entries/domain/usecases/upload_image.dart';
 import 'package:scheck/features/entries/presentation/widgets/meal_registration_form.dart';
 import 'package:scheck/injection.dart';
 import 'dart:developer' as developer;
@@ -24,9 +28,10 @@ class MealRegistrationPage extends StatelessWidget {
 @injectable
 class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationState> {
   final AddEntry addEntry;
+  final UploadImage uploadImage;
   final SupabaseClient supabaseClient;
 
-  MealRegistrationBloc({required this.addEntry, required this.supabaseClient})
+  MealRegistrationBloc({required this.addEntry, required this.uploadImage, required this.supabaseClient})
       : super(const MealRegistrationState()) {
     on<SelectImage>(_onSelectImage);
     on<UpdateMealType>(_onUpdateMealType);
@@ -38,7 +43,7 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
 
   Future<void> _onSelectImage(SelectImage event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(
-      imageUrl: event.imageUrl,
+      image: event.image,
       status: MealRegistrationStatus.editing,
     ));
   }
@@ -74,11 +79,18 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
   Future<void> _onSubmitMeal(SubmitMeal event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(status: MealRegistrationStatus.submitting));
     try {
+      final userId = supabaseClient.auth.currentUser?.id ?? '';
+      final entryId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      final imageUrl = state.image != null
+          ? await uploadImage.call(state.image!, userId, entryId)
+          : EntryRemoteDataSourceSupabase.emptyImageUrl();
+
       final entry = MealEntry(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: supabaseClient.auth.currentUser?.id ?? '',
+        id: entryId,
+        userId: userId,
         timestamp: DateTime.now(),
-        imageUrl: state.imageUrl,
+        imageUrl: imageUrl,
         mealType: state.mealType,
         ingredients: state.ingredients,
         moodBeforeMeal: state.moodBeforeMeal,
@@ -98,9 +110,9 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
 abstract class MealRegistrationEvent {}
 
 class SelectImage extends MealRegistrationEvent {
-  final String imageUrl;
+  final File image;
 
-  SelectImage(this.imageUrl);
+  SelectImage(this.image);
 }
 
 class UpdateMealType extends MealRegistrationEvent {
@@ -132,7 +144,7 @@ class SubmitMeal extends MealRegistrationEvent {}
 
 @immutable
 class MealRegistrationState {
-  final String imageUrl;
+  final File? image;
   final MealType mealType;
   final List<String> ingredients;
   final Mood? moodBeforeMeal;
@@ -140,11 +152,11 @@ class MealRegistrationState {
   final MessageFacade? error;
   final MealRegistrationStatus status;
 
-  bool get readyToSave => imageUrl.isNotEmpty;
+  bool get readyToSave => image != null;
   String get ingredientsText => ingredients.join(', ');
 
   const MealRegistrationState({
-    this.imageUrl = '',
+    this.image,
     this.mealType = MealType.other,
     this.ingredients = const [],
     this.moodBeforeMeal,
@@ -154,7 +166,7 @@ class MealRegistrationState {
   });
 
   MealRegistrationState copyWith({
-    String? imageUrl,
+    File? image,
     MealType? mealType,
     List<String>? ingredients,
     Mood? moodBeforeMeal,
@@ -163,7 +175,7 @@ class MealRegistrationState {
     MealRegistrationStatus? status,
   }) {
     return MealRegistrationState(
-      imageUrl: imageUrl ?? this.imageUrl,
+      image: image ?? this.image,
       mealType: mealType ?? this.mealType,
       ingredients: ingredients ?? this.ingredients,
       moodBeforeMeal: moodBeforeMeal ?? this.moodBeforeMeal,

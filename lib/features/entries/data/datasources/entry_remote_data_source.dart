@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:scheck/features/entries/data/datasources/supabase/entry_change.dart';
 import 'package:scheck/features/entries/data/models/entry_model.dart';
 
@@ -6,4 +8,6 @@ abstract class EntryRemoteDataSource {
   Future<void> insert(EntryModel entry);
   Future<void> delete(String id);
   Stream<EntryChange> watchRealtime();
+  Future<String> uploadImage(File image, String userId, String entryId);
+  Future<void> deleteImage(String userId, String entryId);
 }
