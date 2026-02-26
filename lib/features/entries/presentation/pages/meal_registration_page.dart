@@ -89,9 +89,15 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       final entryId = DateTime.now().millisecondsSinceEpoch.toString();
 
       final localImageUrl = state.image?.path;
+
+      //TODO: <bring back before production release>
+      /*
       final remoteImageUrl = state.image != null
           ? await uploadImage.call(state.image!, userId, entryId)
           : imageService.emptyImageUrl;
+       */
+      // to spare space during development
+      final remoteImageUrl = imageService.emptyImageUrl;
 
       final entry = MealEntry(
         id: entryId,

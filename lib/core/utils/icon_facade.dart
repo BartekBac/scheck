@@ -18,6 +18,10 @@ class IconFacade {
 
   static const IconData settings = Icons.settings_rounded;
   static const IconData noImage = Icons.broken_image;
+  static const IconData logOut = Icons.logout;
+  static const IconData account = Icons.account_circle;
+  static const IconData edit = Icons.edit;
+  static const IconData lock = Icons.lock;
 
 
 

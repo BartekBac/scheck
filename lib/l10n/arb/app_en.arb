@@ -2,6 +2,9 @@
     "@@locale": "en",
 
     "appTitle": "Meal Feel",
+    "greet1": "Welcome",
+    "greet2": "Hi",
+    "greet3": "Hello",
     "generalNotAvailable": "N/A",
 
     "buttonInfo": "Info",
@@ -145,6 +148,7 @@
 
     "signIn": "Sign In",
     "signUp": "Sign Up",
+    "logOut": "Log Out",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
@@ -153,7 +157,7 @@
     "createAccount": "Create Account",
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
-    "send": "Send",
+    "confirm": "Confirm",
     "cancel": "Cancel",
     "loading": "Loading",
     "dontHaveAccount": "Don't have an account? Sign Up",
@@ -163,5 +167,14 @@
     "pleaseEnterPassword": "Please enter your password",
     "pleaseConfirmPassword": "Please confirm your password",
     "passwordTooShort": "Password must be at least 6 characters",
-    "passwordsDoNotMatch": "Passwords do not match"
+    "passwordsDoNotMatch": "Passwords do not match",
+    "changedNameMessage": "User name changed successfully.",
+    "changedAvatarMessage": "User avatar changed successfully.",
+    "resetPasswordMessage": "Reset password email has been sent.",
+
+    "menuChangeAvatar": "Change Avatar",
+    "menuChangeName": "Change Name",
+    "menuResetPassword": "Reset Password",
+    "menuLogOut": "Log Out",
+    "logoutConfirmation": "Are you sure you want to log out?"
 }

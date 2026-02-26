@@ -1,6 +1,9 @@
 {
     "@@locale": "es",
     "appTitle": "Meal Feel",
+    "greet1": "Bienvenido",
+    "greet2": "Hola",
+    "greet3": "Buenos días",
     "generalNotAvailable": "No disponible",
     "buttonInfo": "Info",
     "buttonDelete": "Eliminar",
@@ -67,6 +70,7 @@
     "detailsDialogNoImage": "Sin imagen",
     "signIn": "Iniciar Sesión",
     "signUp": "Registrarse",
+    "logOut": "Cerrar Sesión",
     "email": "Correo Electrónico",
     "password": "Contraseña",
     "confirmPassword": "Confirmar Contraseña",
@@ -75,7 +79,7 @@
     "createAccount": "Crear Cuenta",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetPassword": "Restablecer Contraseña",
-    "send": "Enviar",
+    "confirm": "Confirmar",
     "cancel": "Cancelar",
     "loading": "Cargando",
     "dontHaveAccount": "¿No tienes una cuenta? Regístrate",
@@ -85,5 +89,13 @@
     "pleaseEnterPassword": "Por favor ingresa tu contraseña",
     "pleaseConfirmPassword": "Por favor confirma tu contraseña",
     "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
-    "passwordsDoNotMatch": "Las contraseñas no coinciden"
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "changedNameMessage": "Nombre de usuario cambiado exitosamente.",
+    "changedAvatarMessage": "Avatar de usuario cambiado exitosamente.",
+    "resetPasswordMessage": "El correo de restablecimiento de contraseña ha sido enviado.",
+    "menuChangeAvatar": "Cambiar Avatar",
+    "menuChangeName": "Cambiar Nombre",
+    "menuResetPassword": "Restablecer Contraseña",
+    "menuLogOut": "Cerrar Sesión",
+    "logoutConfirmation": "¿Estás seguro de que quieres cerrar sesión?"
 }

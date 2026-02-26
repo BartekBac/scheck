@@ -72,24 +72,6 @@ class SettingsPage extends StatelessWidget {
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 24),
-                  //TODO: make SignOut button better fitted
-                  // Sign Out Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        context.read<AuthBloc>().add(const AuthEvent.signOutRequested());
-                        Navigator.of(context).pushReplacementNamed('/sign_in');
-                      },
-                      icon: const Icon(Icons.logout),
-                      label: Text('Sign Out'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
