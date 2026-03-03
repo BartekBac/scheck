@@ -171,6 +171,7 @@
     "changedNameMessage": "User name changed successfully.",
     "changedAvatarMessage": "User avatar changed successfully.",
     "resetPasswordMessage": "Reset password email has been sent.",
+    "analyzingImageMessage": "Analyzing image data...",
 
     "menuChangeAvatar": "Change Avatar",
     "menuChangeName": "Change Name",

@@ -66,6 +66,7 @@ enum MealType {
   lunch,
   dinner,
   snack,
+  supper,
   other,
 }
 
@@ -83,6 +84,7 @@ extension MealTypeExtension on MealType {
     MealType.lunch => 'Lunch',
     MealType.dinner => 'Dinner',
     MealType.snack => 'Snack',
+    MealType.supper => 'Supper',
     MealType.other => 'Other',
   };
 }

@@ -93,6 +93,7 @@
     "changedNameMessage": "Nombre de usuario cambiado exitosamente.",
     "changedAvatarMessage": "Avatar de usuario cambiado exitosamente.",
     "resetPasswordMessage": "El correo de restablecimiento de contraseña ha sido enviado.",
+    "analyzingImageMessage": "Analizando datos de imagen...",
     "menuChangeAvatar": "Cambiar Avatar",
     "menuChangeName": "Cambiar Nombre",
     "menuResetPassword": "Restablecer Contraseña",

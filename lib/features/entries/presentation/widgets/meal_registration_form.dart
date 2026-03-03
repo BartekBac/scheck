@@ -26,12 +26,29 @@ class MealRegistrationForm extends StatelessWidget {
     return BlocBuilder<MealRegistrationBloc, MealRegistrationState>(
       builder: (context, state) {
         return BlocListener<MealRegistrationBloc, MealRegistrationState>(
-          listenWhen: (prev, curr) => curr.status == MealRegistrationStatus.error,
+          listenWhen: (prev, curr) => switch(curr.status) {
+            MealRegistrationStatus.initial ||
+            MealRegistrationStatus.editing ||
+            MealRegistrationStatus.submitting => false,
+
+            MealRegistrationStatus.analyzing ||
+            MealRegistrationStatus.analyzed ||
+            MealRegistrationStatus.error => true,
+          },
           listener: (context, state) {
             if(state.error != null) {
               ErrorHandler.showAtSnackBar(
                   context, state.error!.getMessage(context.l10n));
             }
+            switch(state.status) {
+              case MealRegistrationStatus.analyzing:
+                DialogHandler.showSnackBar(context, message: context.l10n.analyzingImageMessage, duration: Duration(minutes: 1));
+              case MealRegistrationStatus.analyzed:
+                DialogHandler.clearSnackBar(context);
+              default:
+                null;
+            }
+
           },
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -76,17 +93,29 @@ class MealRegistrationForm extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SectionTitle(l10n.titleMealPhoto),
-            IconButton(
-              icon: Icon(IconFacade.gallery),
-              color: ColorStyler.Primary.color(context),
-              onPressed: () async {
-                try {
-                  _pickImage(bloc, ImageSource.gallery);
-                } catch (e) {
-                  log(e.toString(), error: e);
-                  DialogHandler.showSnackBar(context, message: l10n.errorGalleryNotAvailable);
-                }
-              },
+            Row(
+              children: [
+                if(state.image != null)
+                  IconButton(
+                    icon: Icon(IconFacade.aiWand),
+                    color: ColorStyler.Primary.color(context),
+                    onPressed: () async {
+                      context.read<MealRegistrationBloc>().add(AnalyzeMealImage(state.image!));
+                    },
+                  ),
+                IconButton(
+                  icon: Icon(IconFacade.gallery),
+                  color: ColorStyler.Primary.color(context),
+                  onPressed: () async {
+                    try {
+                      _pickImage(bloc, ImageSource.gallery);
+                    } catch (e) {
+                      log(e.toString(), error: e);
+                      DialogHandler.showSnackBar(context, message: l10n.errorGalleryNotAvailable);
+                    }
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -111,7 +140,7 @@ class MealRegistrationForm extends StatelessWidget {
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(IconFacade.take_photo, size: 48, color: ColorStyler.Surface.ultraLightOnColor(context)),
+                      Icon(IconFacade.takePhoto, size: 48, color: ColorStyler.Surface.ultraLightOnColor(context)),
                       const SizedBox(height: 8),
                       Text(l10n.hintTapToTakePhoto,
                           style: TextStyler.Title.small(context).copyWith(color: ColorStyler.Surface.ultraLightOnColor(context)))

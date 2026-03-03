@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:injectable/injectable.dart';
@@ -38,5 +39,10 @@ class ImageService {
     }
 
     return File(compressedXFile.path);
+  }
+
+  Future<String> baseEncodeImage(File file) async {
+    final image = await compressImage(file);
+    return base64Encode(await image.readAsBytes());
   }
 }

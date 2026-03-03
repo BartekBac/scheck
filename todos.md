@@ -1,7 +1,8 @@
 # TODOs
-1. Add AI capabilities to interpret images in MealRegistrationPage
-2. Add Edit Entry functionality
+1. Add Edit Entry functionality
+2. Add possibility to change entry addition time 
 3. Add ChangeAvatar functionality
+4. Improve AI capabilities (better mealType deduction -> rename to analyzeMeal?)
 
 # Test Creds
 email: gagejir539@alibto.com  
