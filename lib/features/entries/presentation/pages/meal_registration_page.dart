@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/services/image_service.dart';
+import 'package:scheck/core/services/meal_analyzer.dart';
 import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
+import 'package:scheck/features/entries/domain/usecases/upload_image.dart';
 import 'package:scheck/features/entries/presentation/widgets/meal_registration_form.dart';
 import 'package:scheck/injection.dart';
 import 'dart:developer' as developer;
@@ -24,9 +29,18 @@ class MealRegistrationPage extends StatelessWidget {
 @injectable
 class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationState> {
   final AddEntry addEntry;
+  final UploadImage uploadImage;
   final SupabaseClient supabaseClient;
+  final ImageService imageService;
+  final MealAnalyzer mealAnalyzer;
 
-  MealRegistrationBloc({required this.addEntry, required this.supabaseClient})
+  MealRegistrationBloc({
+    required this.addEntry,
+    required this.uploadImage,
+    required this.supabaseClient,
+    required this.imageService,
+    required this.mealAnalyzer
+  })
       : super(const MealRegistrationState()) {
     on<SelectImage>(_onSelectImage);
     on<UpdateMealType>(_onUpdateMealType);
@@ -34,12 +48,37 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
     on<UpdateMood>(_onUpdateMood);
     on<UpdateDescription>(_onUpdateDescription);
     on<SubmitMeal>(_onSubmitMeal);
+    on<AnalyzeMealImage>(_onAnalyzeMealImage);
   }
 
   Future<void> _onSelectImage(SelectImage event, Emitter<MealRegistrationState> emit) async {
+    //TODO: <bring back before production release>
+    // then AnalyzeMealImage event may be removed
+    /*
+    emit(state.copyWith(status: MealRegistrationStatus.analyzing));
+    final mealAnalyzerResponse = await mealAnalyzer.analyzeMeal(event.image);
     emit(state.copyWith(
-      imageUrl: event.imageUrl,
+      image: event.image,
+      mealType: mealAnalyzerResponse.mealType,
+      ingredients: mealAnalyzerResponse.ingredients,
+      description: mealAnalyzerResponse.description,
+      status: MealRegistrationStatus.analyzed,
+    ));*/
+    emit(state.copyWith(
+      image: event.image,
       status: MealRegistrationStatus.editing,
+    ));
+  }
+
+  Future<void> _onAnalyzeMealImage(AnalyzeMealImage event, Emitter<MealRegistrationState> emit) async {
+    emit(state.copyWith(status: MealRegistrationStatus.analyzing));
+    //TODO: improve mealType deduction adding current time to system message context? or even add a feature that enables time change when saving meal entry
+    final mealAnalyzerResponse = await mealAnalyzer.analyzeMeal(event.image);
+    emit(state.copyWith(
+      mealType: mealAnalyzerResponse.mealType,
+      ingredients: mealAnalyzerResponse.ingredients,
+      description: mealAnalyzerResponse.description,
+      status: MealRegistrationStatus.analyzed,
     ));
   }
 
@@ -74,11 +113,26 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
   Future<void> _onSubmitMeal(SubmitMeal event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(status: MealRegistrationStatus.submitting));
     try {
+      final userId = supabaseClient.auth.currentUser?.id ?? '';
+      final entryId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      final localImageUrl = state.image?.path;
+
+      //TODO: <bring back before production release>
+      /*
+      final remoteImageUrl = state.image != null
+          ? await uploadImage.call(state.image!, userId, entryId)
+          : imageService.emptyImageUrl;
+       */
+      // to spare space during development
+      final remoteImageUrl = imageService.emptyImageUrl;
+
       final entry = MealEntry(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: supabaseClient.auth.currentUser?.id ?? '',
+        id: entryId,
+        userId: userId,
         timestamp: DateTime.now(),
-        imageUrl: state.imageUrl,
+        localImageUrl: localImageUrl,
+        remoteImageUrl: remoteImageUrl,
         mealType: state.mealType,
         ingredients: state.ingredients,
         moodBeforeMeal: state.moodBeforeMeal,
@@ -98,9 +152,15 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
 abstract class MealRegistrationEvent {}
 
 class SelectImage extends MealRegistrationEvent {
-  final String imageUrl;
+  final File image;
 
-  SelectImage(this.imageUrl);
+  SelectImage(this.image);
+}
+
+class AnalyzeMealImage extends MealRegistrationEvent {
+  final File image;
+
+  AnalyzeMealImage(this.image);
 }
 
 class UpdateMealType extends MealRegistrationEvent {
@@ -132,7 +192,7 @@ class SubmitMeal extends MealRegistrationEvent {}
 
 @immutable
 class MealRegistrationState {
-  final String imageUrl;
+  final File? image;
   final MealType mealType;
   final List<String> ingredients;
   final Mood? moodBeforeMeal;
@@ -140,11 +200,11 @@ class MealRegistrationState {
   final MessageFacade? error;
   final MealRegistrationStatus status;
 
-  bool get readyToSave => imageUrl.isNotEmpty;
+  bool get readyToSave => image != null;
   String get ingredientsText => ingredients.join(', ');
 
   const MealRegistrationState({
-    this.imageUrl = '',
+    this.image,
     this.mealType = MealType.other,
     this.ingredients = const [],
     this.moodBeforeMeal,
@@ -154,7 +214,7 @@ class MealRegistrationState {
   });
 
   MealRegistrationState copyWith({
-    String? imageUrl,
+    File? image,
     MealType? mealType,
     List<String>? ingredients,
     Mood? moodBeforeMeal,
@@ -163,7 +223,7 @@ class MealRegistrationState {
     MealRegistrationStatus? status,
   }) {
     return MealRegistrationState(
-      imageUrl: imageUrl ?? this.imageUrl,
+      image: image ?? this.image,
       mealType: mealType ?? this.mealType,
       ingredients: ingredients ?? this.ingredients,
       moodBeforeMeal: moodBeforeMeal ?? this.moodBeforeMeal,
@@ -177,6 +237,8 @@ class MealRegistrationState {
 enum MealRegistrationStatus {
   initial,
   editing,
+  analyzing,
+  analyzed,
   submitting,
   error,
 }

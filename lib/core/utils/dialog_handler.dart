@@ -29,7 +29,7 @@ class DialogHandler {
     ) ?? false;
   }
 
-  static void showSnackBar(BuildContext context, {required String message, Color? backgroundColor, bool immediate = false}) {
+  static void showSnackBar(BuildContext context, {required String message, Color? backgroundColor, bool immediate = false, Duration duration = const Duration(seconds: 4)}) {
     backgroundColor ??= ColorStyler.Primary.color(context);
     if(immediate) {
       clearSnackBar(context);
@@ -39,7 +39,7 @@ class DialogHandler {
         behavior: SnackBarBehavior.floating,
         content: Text(message),
         backgroundColor: backgroundColor,
-
+        duration: duration,
       ),
     );
   }

@@ -141,7 +141,7 @@ class _EntryCardState extends State<EntryCard> {
             ],
             if (entry is MealEntry) ...[
               Text(l10n.detailsDialogMealLabel(entry.mealType.label)),
-              Flexible(child: Text(l10n.detailsDialogImageLabel(entry.imageUrl))),
+              Text(l10n.detailsDialogImageLabel(entry.localImageUrl ?? entry.remoteImageUrl ?? context.l10n.detailsDialogNoImage)),
               Row(
                 children: [
                   Text(l10n.detailsDialogMoodLabel),
@@ -231,27 +231,54 @@ class _EntryCardState extends State<EntryCard> {
     }
   }
 
+  Widget _noImage(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 100,
+      decoration: BoxDecoration(
+        color: ColorStyler.ErrorContainer.color(context),
+        borderRadius: ShapeStyler.FieldShape.borderRadius,
+      ),
+      child: Center(
+        child: Icon(
+          IconFacade.noImage,
+          size: 40,
+          color: ColorStyler.ErrorContainer.onColor(context),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMealImage(MealEntry mealEntry) {
-    if (widget.entry is MealEntry) {
-      final imageUrl = Uri.parse(mealEntry.imageUrl);
-      if (imageUrl.isScheme('http') || imageUrl.isScheme('https')) {
-        return Image.network(
-          mealEntry.imageUrl,
-          width: double.infinity,
-          height: 100,
-          fit: BoxFit.cover,
-        );
-      } else {
-        return Image.file(
-          File(mealEntry.imageUrl),
-          width: double.infinity,
-          height: 100,
-          fit: BoxFit.cover,
-        );
-      }
-    } else {
-      return const SizedBox();
+    final localFile = File(mealEntry.localImageUrl ?? '');
+    if(mealEntry.localImageUrl != null && localFile.existsSync()) {
+      return Image.file(
+        localFile,
+        width: double.infinity,
+        height: 100,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _noImage(context),
+      );
     }
+
+    if(mealEntry.remoteImageUrl != null) {
+      return Image.network(
+        mealEntry.remoteImageUrl!,
+        width: double.infinity,
+        height: 100,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _noImage(context),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const SizedBox(
+            height: 100,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        },
+      );
+    }
+
+    return _noImage(context);
   }
 
   Widget _buildMealDetails(BuildContext context, MealEntry mealEntry) {

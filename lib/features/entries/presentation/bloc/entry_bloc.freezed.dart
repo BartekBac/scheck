@@ -125,13 +125,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<Entry> entries)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<Entry> entries)?  loaded,TResult Function( MessageFacade error)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case EntryInitial() when initial != null:
 return initial();case EntryLoading() when loading != null:
 return loading();case EntryLoaded() when loaded != null:
 return loaded(_that.entries);case EntryError() when error != null:
-return error(_that.message);case _:
+return error(_that.error);case _:
   return orElse();
 
 }
@@ -149,13 +149,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<Entry> entries)  loaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<Entry> entries)  loaded,required TResult Function( MessageFacade error)  error,}) {final _that = this;
 switch (_that) {
 case EntryInitial():
 return initial();case EntryLoading():
 return loading();case EntryLoaded():
 return loaded(_that.entries);case EntryError():
-return error(_that.message);}
+return error(_that.error);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -169,13 +169,13 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<Entry> entries)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<Entry> entries)?  loaded,TResult? Function( MessageFacade error)?  error,}) {final _that = this;
 switch (_that) {
 case EntryInitial() when initial != null:
 return initial();case EntryLoading() when loading != null:
 return loading();case EntryLoaded() when loaded != null:
 return loaded(_that.entries);case EntryError() when error != null:
-return error(_that.message);case _:
+return error(_that.error);case _:
   return null;
 
 }
@@ -323,10 +323,10 @@ as List<Entry>,
 
 
 class EntryError implements EntryState {
-  const EntryError(this.message);
+  const EntryError(this.error);
   
 
- final  String message;
+ final  MessageFacade error;
 
 /// Create a copy of EntryState
 /// with the given fields replaced by the non-null parameter values.
@@ -338,16 +338,16 @@ $EntryErrorCopyWith<EntryError> get copyWith => _$EntryErrorCopyWithImpl<EntryEr
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EntryError&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EntryError&&(identical(other.error, error) || other.error == error));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message);
+int get hashCode => Object.hash(runtimeType,error);
 
 @override
 String toString() {
-  return 'EntryState.error(message: $message)';
+  return 'EntryState.error(error: $error)';
 }
 
 
@@ -358,7 +358,7 @@ abstract mixin class $EntryErrorCopyWith<$Res> implements $EntryStateCopyWith<$R
   factory $EntryErrorCopyWith(EntryError value, $Res Function(EntryError) _then) = _$EntryErrorCopyWithImpl;
 @useResult
 $Res call({
- String message
+ MessageFacade error
 });
 
 
@@ -375,10 +375,10 @@ class _$EntryErrorCopyWithImpl<$Res>
 
 /// Create a copy of EntryState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
   return _then(EntryError(
-null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as MessageFacade,
   ));
 }
 

@@ -26,7 +26,8 @@ Map<String, dynamic> _$EntryModelToJson(EntryModel instance) =>
     };
 
 MealData _$MealDataFromJson(Map<String, dynamic> json) => MealData(
-  imageUrl: json['imageUrl'] as String,
+  localImageUrl: json['localImageUrl'] as String?,
+  remoteImageUrl: json['remoteImageUrl'] as String?,
   mealType: json['mealType'] as String,
   ingredients: (json['ingredients'] as List<dynamic>)
       .map((e) => e as String)
@@ -35,7 +36,8 @@ MealData _$MealDataFromJson(Map<String, dynamic> json) => MealData(
 );
 
 Map<String, dynamic> _$MealDataToJson(MealData instance) => <String, dynamic>{
-  'imageUrl': instance.imageUrl,
+  'localImageUrl': instance.localImageUrl,
+  'remoteImageUrl': instance.remoteImageUrl,
   'mealType': instance.mealType,
   'ingredients': instance.ingredients,
   'moodBeforeMeal': instance.moodBeforeMeal,

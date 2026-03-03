@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/services/image_service.dart';
 import 'package:scheck/features/entries/data/datasources/entry_local_data_source.dart';
 import 'package:scheck/features/entries/data/datasources/entry_remote_data_source.dart';
 import 'package:scheck/features/entries/data/datasources/supabase/entry_change.dart';
@@ -10,8 +13,9 @@ import 'package:scheck/features/entries/domain/repositories/entry_repository.dar
 class EntryRepositoryImpl implements EntryRepository {
   final EntryLocalDataSource local;
   final EntryRemoteDataSource remote;
+  final ImageService imageService;
 
-  EntryRepositoryImpl(this.local, this.remote) {
+  EntryRepositoryImpl(this.local, this.remote, this.imageService) {
     _subscribeToRealtime();
   }
 
@@ -62,5 +66,16 @@ class EntryRepositoryImpl implements EntryRepository {
           await local.delete(id);
       }
     });
+  }
+
+  @override
+  Future<String> uploadImage(File image, String userId, String entryId) async {
+    final compressedImage = await imageService.compressImage(image);
+    return remote.uploadImage(compressedImage, userId, entryId);
+  }
+
+  @override
+  Future<void> deleteImage(String userId, String entryId) async {
+    return remote.deleteImage(userId, entryId);
   }
 }

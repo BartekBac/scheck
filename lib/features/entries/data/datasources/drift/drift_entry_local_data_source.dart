@@ -37,6 +37,7 @@ class DriftEntryLocalDataSource implements EntryLocalDataSource {
   @override
   Future<void> upsertAll(List<EntryModel> entries) async {
     await db.batch((batch) {
+      batch.deleteAll(db.entries);
       batch.insertAllOnConflictUpdate(
         db.entries,
         entries.map(_toCompanion).toList(),

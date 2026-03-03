@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:injectable/injectable.dart';
+import 'package:scheck/core/services/image_service.dart';
 import 'package:scheck/features/entries/data/datasources/entry_remote_data_source.dart';
 import 'package:scheck/features/entries/data/datasources/supabase/entry_change.dart';
 import 'package:scheck/features/entries/data/models/entry_model.dart';
@@ -9,8 +11,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 @LazySingleton(as: EntryRemoteDataSource)
 class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
   final SupabaseClient _client;
+  final String _tableName = ImageService.tableName;
+  final String _bucketName = ImageService.bucketName;
   final StreamController<EntryChange> _controller = StreamController<EntryChange>.broadcast();
-  static const String _tableName = 'entries';
+  static String imageStoragePath(String bucketName, String userId, String entryId) => '$bucketName/$userId/$entryId.jpg';
 
   EntryRemoteDataSourceSupabase(this._client) {
     _setupRealtimeSubscription();
@@ -75,6 +79,39 @@ class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
   }
 
   @override
+  Future<String> uploadImage(File image, String userId, String entryId) async {
+    final String storagePath = imageStoragePath(_bucketName, userId, entryId);
+
+    try {
+      await _client.storage
+          .from(_bucketName)
+          .upload(storagePath, image);
+
+      final String publicUrl = _client.storage
+          .from(_bucketName)
+          .getPublicUrl(storagePath);
+
+      return publicUrl;
+    } catch (e) {
+      throw Exception('Error uploading image: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteImage(String userId, String entryId) async {
+    final String storagePath = imageStoragePath(_bucketName, userId, entryId);
+
+    try {
+      await _client.storage
+          .from(_bucketName)
+          .remove([storagePath]);
+
+    } catch (e) {
+      throw Exception('Error deleting image: $e');
+    }
+  }
+
+  @override
   Future<void> insert(EntryModel entry) async {
     try {
       final currentUser = _client.auth.currentUser;
@@ -95,7 +132,8 @@ class EntryRemoteDataSourceSupabase implements EntryRemoteDataSource {
       if (currentUser == null) {
         throw Exception('User not authenticated');
       }
-      
+
+      //delete row from table
       await _client
           .from(_tableName)
           .delete()

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scheck/core/stylers/shape_styler.dart';
 import 'package:scheck/core/utils/dialog_handler.dart';
 import 'package:scheck/core/utils/error_handler.dart';
 import 'package:scheck/core/utils/message_facade.dart';
@@ -159,6 +160,7 @@ class _SignInPageState extends State<SignInPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: ShapeStyler.DialogShape.outlinedBorder,
         title: Text(context.l10n.resetPassword),
         content: TextFormField(
           controller: emailController,
@@ -182,7 +184,7 @@ class _SignInPageState extends State<SignInPage> {
                 Navigator.of(context).pop();
               }
             },
-            child: Text(context.l10n.send),
+            child: Text(context.l10n.confirm),
           ),
         ],
       ),

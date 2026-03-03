@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:scheck/core/services/image_service.dart' as _i883;
+import 'package:scheck/core/services/meal_analyzer.dart' as _i882;
 import 'package:scheck/core/services/supabase_service.dart' as _i534;
 import 'package:scheck/features/auth/data/datasources/supabase_auth_datasource.dart'
     as _i851;
@@ -44,8 +46,12 @@ import 'package:scheck/features/entries/domain/usecases/add_entry.dart'
     as _i292;
 import 'package:scheck/features/entries/domain/usecases/delete_entry.dart'
     as _i1066;
+import 'package:scheck/features/entries/domain/usecases/delete_image.dart'
+    as _i666;
 import 'package:scheck/features/entries/domain/usecases/get_entries.dart'
     as _i955;
+import 'package:scheck/features/entries/domain/usecases/upload_image.dart'
+    as _i974;
 import 'package:scheck/features/entries/domain/usecases/watch_entries.dart'
     as _i891;
 import 'package:scheck/features/entries/presentation/bloc/entry_bloc.dart'
@@ -85,6 +91,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i583.EntryLocalDataSource>(
       () => _i962.DriftEntryLocalDataSource(gh<_i112.AppDriftDatabase>()),
     );
+    gh.lazySingleton<_i883.ImageService>(
+      () => _i883.ImageService(gh<_i454.SupabaseClient>()),
+    );
     gh.lazySingleton<_i851.AuthDataSource>(
       () => _i851.SupabaseAuthDataSource(gh<_i454.SupabaseClient>()),
     );
@@ -103,24 +112,22 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i352.AuthRepository>(
       () => _i401.AuthRepositoryImpl(gh<_i851.AuthDataSource>()),
     );
-    gh.lazySingleton<_i59.EntryRepository>(
-      () => _i160.EntryRepositoryImpl(
-        gh<_i583.EntryLocalDataSource>(),
-        gh<_i459.EntryRemoteDataSource>(),
+    gh.lazySingleton<_i882.MealAnalyzer>(
+      () => _i882.MealAnalyzer(
+        gh<_i454.SupabaseClient>(),
+        gh<_i883.ImageService>(),
       ),
     );
     gh.factory<_i685.SettingsBloc>(
       () =>
           _i685.SettingsBloc(gh<_i65.GetSettings>(), gh<_i677.SaveSettings>()),
     );
-    gh.factory<_i292.AddEntry>(
-      () => _i292.AddEntry(gh<_i59.EntryRepository>()),
-    );
-    gh.factory<_i1066.DeleteEntry>(
-      () => _i1066.DeleteEntry(gh<_i59.EntryRepository>()),
-    );
-    gh.factory<_i891.WatchEntries>(
-      () => _i891.WatchEntries(gh<_i59.EntryRepository>()),
+    gh.lazySingleton<_i59.EntryRepository>(
+      () => _i160.EntryRepositoryImpl(
+        gh<_i583.EntryLocalDataSource>(),
+        gh<_i459.EntryRemoteDataSource>(),
+        gh<_i883.ImageService>(),
+      ),
     );
     gh.factory<_i520.GetCurrentUser>(
       () => _i520.GetCurrentUser(gh<_i352.AuthRepository>()),
@@ -131,14 +138,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i955.GetEntries>(
       () => _i955.GetEntries(gh<_i59.EntryRepository>()),
     );
-    gh.factory<_i988.EntryBloc>(
-      () => _i988.EntryBloc(
-        getEntries: gh<_i955.GetEntries>(),
-        addEntry: gh<_i292.AddEntry>(),
-        deleteEntry: gh<_i1066.DeleteEntry>(),
-        watchEntries: gh<_i891.WatchEntries>(),
-      ),
-    );
     gh.factory<_i318.AuthBloc>(
       () => _i318.AuthBloc(
         gh<_i352.AuthRepository>(),
@@ -148,10 +147,38 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i520.GetCurrentUser>(),
       ),
     );
+    gh.factory<_i292.AddEntry>(
+      () => _i292.AddEntry(gh<_i59.EntryRepository>()),
+    );
+    gh.factory<_i1066.DeleteEntry>(
+      () => _i1066.DeleteEntry(gh<_i59.EntryRepository>()),
+    );
+    gh.factory<_i666.DeleteImage>(
+      () => _i666.DeleteImage(gh<_i59.EntryRepository>()),
+    );
+    gh.factory<_i974.UploadImage>(
+      () => _i974.UploadImage(gh<_i59.EntryRepository>()),
+    );
+    gh.factory<_i891.WatchEntries>(
+      () => _i891.WatchEntries(gh<_i59.EntryRepository>()),
+    );
+    gh.factory<_i988.EntryBloc>(
+      () => _i988.EntryBloc(
+        getEntries: gh<_i955.GetEntries>(),
+        addEntry: gh<_i292.AddEntry>(),
+        deleteEntry: gh<_i1066.DeleteEntry>(),
+        watchEntries: gh<_i891.WatchEntries>(),
+        uploadImage: gh<_i974.UploadImage>(),
+        deleteImage: gh<_i666.DeleteImage>(),
+      ),
+    );
     gh.factory<_i671.MealRegistrationBloc>(
       () => _i671.MealRegistrationBloc(
         addEntry: gh<_i292.AddEntry>(),
+        uploadImage: gh<_i974.UploadImage>(),
         supabaseClient: gh<_i454.SupabaseClient>(),
+        imageService: gh<_i883.ImageService>(),
+        mealAnalyzer: gh<_i882.MealAnalyzer>(),
       ),
     );
     gh.factory<_i955.SymptomRegistrationBloc>(

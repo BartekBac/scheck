@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class IconFacade {
   static const IconData gallery = Icons.photo_library;
-  static const IconData take_photo = Icons.camera_alt;
+  static const IconData takePhoto = Icons.camera_alt;
   static const IconData meal = Icons.restaurant;
   static const IconData symptom = Icons.sick;
   static const IconData log = Icons.list;
@@ -17,6 +17,13 @@ class IconFacade {
   static const IconData back = Icons.arrow_back;
 
   static const IconData settings = Icons.settings_rounded;
+  static const IconData noImage = Icons.broken_image;
+  static const IconData logOut = Icons.logout;
+  static const IconData account = Icons.account_circle;
+  static const IconData edit = Icons.edit;
+  static const IconData lock = Icons.lock;
+  static const IconData selected = Icons.check;
+  static const IconData aiWand = Icons.auto_fix_high;
 
 
 

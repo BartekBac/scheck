@@ -1,8 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:scheck/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:scheck/core/stylers/shape_styler.dart';
+import 'package:scheck/core/stylers/text_styler.dart';
+import 'package:scheck/core/utils/icon_facade.dart';
 import 'package:scheck/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:scheck/l10n/l10n.dart';
 
@@ -33,8 +33,28 @@ class SettingsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Primary Color Selector
+                  Text(l10n.titlePrimaryColor, style: TextStyler.Title.medium(context)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [Colors.indigo, Colors.deepPurple, Colors.teal, Colors.amber, Colors.blueAccent, Colors.blueGrey, Colors.green, Colors.lime].map((color) {
+                      return GestureDetector(
+                        onTap: () {
+                          context.read<SettingsBloc>().add(SettingsEvent.changePrimaryColor(color.value));
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: color,
+                          child: settings.primaryColor == color.toARGB32()
+                              ? const Icon(IconFacade.selected, color: Colors.white)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 24),
                   // Language Selector
-                  Text(l10n.titleLanguage, style: Theme.of(context).textTheme.titleLarge),
+                  Text(l10n.titleLanguage, style: TextStyler.Title.medium(context)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
                     value: settings.locale,
@@ -47,47 +67,8 @@ class SettingsPage extends StatelessWidget {
                         context.read<SettingsBloc>().add(SettingsEvent.changeLanguage(locale));
                       }
                     },
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Primary Color Selector
-                  Text(l10n.titlePrimaryColor, style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: [Colors.indigo, Colors.deepPurple, Colors.teal, Colors.amber, Colors.blueAccent, Colors.blueGrey, Colors.green, Colors.lime].map((color) {
-                      return GestureDetector(
-                        onTap: () {
-                          context.read<SettingsBloc>().add(SettingsEvent.changePrimaryColor(color.value));
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: color,
-                          child: settings.primaryColor == color.value
-                              ? const Icon(Icons.check, color: Colors.white)
-                              : null,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-                  //TODO: make SignOut button better fitted
-                  // Sign Out Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        context.read<AuthBloc>().add(const AuthEvent.signOutRequested());
-                        Navigator.of(context).pushReplacementNamed('/sign_in');
-                      },
-                      icon: const Icon(Icons.logout),
-                      label: Text('Sign Out'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
+                    decoration: InputDecoration(
+                      border: ShapeStyler.InnerFieldShape.inputBorder,
                     ),
                   ),
                 ],
