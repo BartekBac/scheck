@@ -164,7 +164,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      ElevatedButton(
+                      FilledButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             context.read<AuthBloc>().add(
