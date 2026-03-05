@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scheck/core/stylers/color_styler.dart';
 import 'package:scheck/core/utils/icon_facade.dart';
+import 'package:scheck/l10n/l10n.dart';
 
 abstract class Entry extends Equatable {
   final String id;
@@ -79,13 +80,13 @@ enum Mood {
 }
 
 extension MealTypeExtension on MealType {
-  String get label => switch(this) {
-    MealType.breakfast => 'Breakfast',
-    MealType.lunch => 'Lunch',
-    MealType.dinner => 'Dinner',
-    MealType.snack => 'Snack',
-    MealType.supper => 'Supper',
-    MealType.other => 'Other',
+  String getLabel(BuildContext context) => switch(this) {
+    MealType.breakfast => context.l10n.mealTypeBreakfast,
+    MealType.lunch => context.l10n.mealTypeLunch,
+    MealType.dinner => context.l10n.mealTypeDinner,
+    MealType.snack => context.l10n.mealTypeSnack,
+    MealType.supper => context.l10n.mealTypeSupper,
+    MealType.other => context.l10n.mealTypeOther,
   };
 }
 
@@ -98,12 +99,12 @@ extension MoodExtension on Mood {
     Mood.terrible => IconFacade.terrible
   };
 
-  String get label => switch(this) {
-    Mood.great => 'Great',
-    Mood.good => 'Good',
-    Mood.neutral => 'Neutral',
-    Mood.bad => 'Bad',
-    Mood.terrible => 'Terrible'
+  String getLabel(BuildContext context) => switch(this) {
+    Mood.great => context.l10n.moodGreat,
+    Mood.good => context.l10n.moodGood,
+    Mood.neutral => context.l10n.moodNeutral,
+    Mood.bad => context.l10n.moodBad,
+    Mood.terrible => context.l10n.moodTerrible
   };
 
   Color getColor(BuildContext context) => switch(this) {

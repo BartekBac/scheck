@@ -174,7 +174,7 @@ class MealRegistrationForm extends StatelessWidget {
           runSpacing: 8,
           children: MealType.values.map((type) {
             return ChoiceChip(
-              label: Text(type.label),
+              label: Text(type.getLabel(context)),
               showCheckmark: false,
               selected: state.mealType == type,
               onSelected: (selected) {

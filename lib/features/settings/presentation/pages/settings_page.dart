@@ -70,6 +70,7 @@ class SettingsPage extends StatelessWidget {
                     items: [
                       DropdownMenuItem(value: 'en', child: Text(l10n.languageEnglish)),
                       DropdownMenuItem(value: 'es', child: Text(l10n.languageSpanish)),
+                      DropdownMenuItem(value: 'pl', child: Text(l10n.languagePolish)),
                     ],
                     onChanged: (locale) {
                       if (locale != null) {

@@ -83,8 +83,22 @@
     "symptomAnxiety": "Anxiety",
     "symptomBrainFog": "Brain fog",
 
+    "mealTypeBreakfast": "Breakfast",
+    "mealTypeLunch": "Lunch",
+    "mealTypeDinner": "Dinner",
+    "mealTypeSnack": "Snack",
+    "mealTypeSupper": "Supper",
+    "mealTypeOther": "Other",
+
+    "moodGreat": "Great",
+    "moodGood": "Good",
+    "moodNeutral": "Neutral",
+    "moodBad": "Bad",
+    "moodTerrible": "Terrible",
+
     "languageEnglish": "English",
     "languageSpanish": "Spanish",
+    "languagePolish": "Polish",
 
 
     "detailsDialogIdLabel": "Id: {id}",
