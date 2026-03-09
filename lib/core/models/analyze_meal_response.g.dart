@@ -1,23 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'meal_analyzer_response.dart';
+part of 'analyze_meal_response.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-MealAnalyzerResponse _$MealAnalyzerResponseFromJson(
-  Map<String, dynamic> json,
-) => MealAnalyzerResponse(
-  mealType: $enumDecode(_$MealTypeEnumMap, json['mealType']),
-  ingredients: (json['ingredients'] as List<dynamic>)
-      .map((e) => e as String)
-      .toList(),
-  description: json['description'] as String,
-);
+AnalyzeMealResponse _$AnalyzeMealResponseFromJson(Map<String, dynamic> json) =>
+    AnalyzeMealResponse(
+      mealType: $enumDecode(_$MealTypeEnumMap, json['mealType']),
+      ingredients: (json['ingredients'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      description: json['description'] as String,
+    );
 
-Map<String, dynamic> _$MealAnalyzerResponseToJson(
-  MealAnalyzerResponse instance,
+Map<String, dynamic> _$AnalyzeMealResponseToJson(
+  AnalyzeMealResponse instance,
 ) => <String, dynamic>{
   'mealType': _$MealTypeEnumMap[instance.mealType]!,
   'ingredients': instance.ingredients,

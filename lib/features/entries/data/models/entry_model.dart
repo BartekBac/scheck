@@ -1,4 +1,6 @@
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/enums/meal_type.dart';
+import 'package:scheck/core/enums/mood.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert';
 

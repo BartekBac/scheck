@@ -201,7 +201,7 @@ return $default(_that.locale,_that.primaryColor);case _:
 
 
 class _AppSettings implements AppSettings {
-  const _AppSettings({this.locale = 'en', this.primaryColor = 0xFF3F51B5});
+  const _AppSettings({this.locale = 'en', this.primaryColor = 0xFF673AB7});
   
 
 @override@JsonKey() final  String locale;

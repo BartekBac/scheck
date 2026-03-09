@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/core/entities/symptom.dart';
+import 'package:scheck/core/enums/meal_type.dart';
+import 'package:scheck/core/enums/mood.dart';
 import 'package:scheck/core/stylers/color_styler.dart';
 import 'package:scheck/core/stylers/shape_styler.dart';
 import 'package:scheck/core/stylers/text_styler.dart';

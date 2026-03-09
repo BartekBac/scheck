@@ -6,7 +6,7 @@ import { serve } from "https://deno.land/std/http/server.ts"
 
 class AIProcessor {
 
-  async process(system_prompt: string | null, user_prompt: string | null, imageBase64: string | null, returnAsJson: boolean = false): Promise<any> {
+  async process(system_prompt: string | null, user_prompt: string | null, image_base_64: string | null, return_as_json: boolean = false): Promise<any> {
 
   const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
     method: "POST",
@@ -22,7 +22,7 @@ class AIProcessor {
           role: "user",
           content: [
             ...(user_prompt ? [{ type: "text", text: user_prompt }] : []),
-            ...(imageBase64 ? [{ type: "image_url", image_url: {url: `data:image/jpeg;base64,${imageBase64}`}}] : [])
+            ...(image_base_64 ? [{ type: "image_url", image_url: {url: `data:image/jpeg;base64,${image_base_64}`}}] : [])
           ]
         }
       ]
@@ -43,7 +43,7 @@ class AIProcessor {
       throw new Error("No content returned from model")
     }
 
-    if(returnAsJson) {
+    if(return_as_json) {
       // Safely extract JSON from the string
       const jsonStart = textOutput.indexOf("{")
       const jsonEnd = textOutput.lastIndexOf("}")
@@ -71,14 +71,14 @@ serve(async (req) => {
   const {
       system_prompt = null,
       user_prompt = null,
-      imageBase64 = null,
-      returnAsJson = false
+      image_base_64 = null,
+      return_as_json = false
   } = await req.json()
 
   const processor = new AIProcessor()
 
   try {
-    const result = await processor.process(system_prompt, user_prompt, imageBase64, returnAsJson)
+    const result = await processor.process(system_prompt, user_prompt, image_base_64, return_as_json)
     return new Response(result, { status: 200 })
   } catch (e) {
     return new Response(
