@@ -101,7 +101,7 @@ class MealRegistrationForm extends StatelessWidget {
                     icon: Icon(IconFacade.aiWand),
                     color: ColorStyler.Primary.color(context),
                     onPressed: () async {
-                      context.read<MealRegistrationBloc>().add(AnalyzeMealImage(state.image!));
+                      context.read<MealRegistrationBloc>().add(AnalyzeMealImage(state.image!, l10n.localeName));
                     },
                   ),
                 IconButton(

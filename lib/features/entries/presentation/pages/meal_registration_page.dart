@@ -8,6 +8,7 @@ import 'package:scheck/core/enums/meal_type.dart';
 import 'package:scheck/core/enums/mood.dart';
 import 'package:scheck/core/services/image_service.dart';
 import 'package:scheck/core/services/ai_service.dart';
+import 'package:scheck/core/services/translation_service.dart';
 import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/upload_image.dart';
@@ -78,8 +79,8 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
     final mealAnalyzerResponse = await aiService.analyzeMeal(event.image);
     emit(state.copyWith(
       mealType: mealAnalyzerResponse.mealType,
-      ingredients: mealAnalyzerResponse.ingredients,
-      description: mealAnalyzerResponse.description,
+      ingredients: await TranslationService.translateJoined(mealAnalyzerResponse.ingredients, to: event.language),
+      description: await TranslationService.translate(mealAnalyzerResponse.description, to: event.language),
       status: MealRegistrationStatus.analyzed,
     ));
   }
@@ -163,8 +164,9 @@ class SelectImage extends MealRegistrationEvent {
 
 class AnalyzeMealImage extends MealRegistrationEvent {
   final File image;
+  final String language;
 
-  AnalyzeMealImage(this.image);
+  AnalyzeMealImage(this.image, this.language);
 }
 
 class UpdateMealType extends MealRegistrationEvent {
