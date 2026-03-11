@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/enums/meal_type.dart';
+import 'package:scheck/core/enums/mood.dart';
 import 'package:scheck/core/services/image_service.dart';
-import 'package:scheck/core/services/meal_analyzer.dart';
+import 'package:scheck/core/services/ai_service.dart';
+import 'package:scheck/core/services/translation_service.dart';
 import 'package:scheck/core/utils/message_facade.dart';
 import 'package:scheck/features/entries/domain/usecases/add_entry.dart';
 import 'package:scheck/features/entries/domain/usecases/upload_image.dart';
@@ -32,14 +35,14 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
   final UploadImage uploadImage;
   final SupabaseClient supabaseClient;
   final ImageService imageService;
-  final MealAnalyzer mealAnalyzer;
+  final AIService aiService;
 
   MealRegistrationBloc({
     required this.addEntry,
     required this.uploadImage,
     required this.supabaseClient,
     required this.imageService,
-    required this.mealAnalyzer
+    required this.aiService
   })
       : super(const MealRegistrationState()) {
     on<SelectImage>(_onSelectImage);
@@ -73,11 +76,11 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
   Future<void> _onAnalyzeMealImage(AnalyzeMealImage event, Emitter<MealRegistrationState> emit) async {
     emit(state.copyWith(status: MealRegistrationStatus.analyzing));
     //TODO: improve mealType deduction adding current time to system message context? or even add a feature that enables time change when saving meal entry
-    final mealAnalyzerResponse = await mealAnalyzer.analyzeMeal(event.image);
+    final mealAnalyzerResponse = await aiService.analyzeMeal(event.image);
     emit(state.copyWith(
       mealType: mealAnalyzerResponse.mealType,
-      ingredients: mealAnalyzerResponse.ingredients,
-      description: mealAnalyzerResponse.description,
+      ingredients: await TranslationService.translateJoined(mealAnalyzerResponse.ingredients, to: event.language),
+      description: await TranslationService.translate(mealAnalyzerResponse.description, to: event.language),
       status: MealRegistrationStatus.analyzed,
     ));
   }
@@ -123,7 +126,9 @@ class MealRegistrationBloc extends Bloc<MealRegistrationEvent, MealRegistrationS
       final remoteImageUrl = state.image != null
           ? await uploadImage.call(state.image!, userId, entryId)
           : imageService.emptyImageUrl;
+
        */
+
       // to spare space during development
       final remoteImageUrl = imageService.emptyImageUrl;
 
@@ -159,8 +164,9 @@ class SelectImage extends MealRegistrationEvent {
 
 class AnalyzeMealImage extends MealRegistrationEvent {
   final File image;
+  final String language;
 
-  AnalyzeMealImage(this.image);
+  AnalyzeMealImage(this.image, this.language);
 }
 
 class UpdateMealType extends MealRegistrationEvent {

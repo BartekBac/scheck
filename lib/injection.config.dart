@@ -11,8 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:scheck/core/services/ai_service.dart' as _i734;
 import 'package:scheck/core/services/image_service.dart' as _i883;
-import 'package:scheck/core/services/meal_analyzer.dart' as _i882;
 import 'package:scheck/core/services/supabase_service.dart' as _i534;
 import 'package:scheck/features/auth/data/datasources/supabase_auth_datasource.dart'
     as _i851;
@@ -112,11 +112,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i352.AuthRepository>(
       () => _i401.AuthRepositoryImpl(gh<_i851.AuthDataSource>()),
     );
-    gh.lazySingleton<_i882.MealAnalyzer>(
-      () => _i882.MealAnalyzer(
-        gh<_i454.SupabaseClient>(),
-        gh<_i883.ImageService>(),
-      ),
+    gh.lazySingleton<_i734.AIService>(
+      () =>
+          _i734.AIService(gh<_i454.SupabaseClient>(), gh<_i883.ImageService>()),
     );
     gh.factory<_i685.SettingsBloc>(
       () =>
@@ -178,7 +176,7 @@ extension GetItInjectableX on _i174.GetIt {
         uploadImage: gh<_i974.UploadImage>(),
         supabaseClient: gh<_i454.SupabaseClient>(),
         imageService: gh<_i883.ImageService>(),
-        mealAnalyzer: gh<_i882.MealAnalyzer>(),
+        aiService: gh<_i734.AIService>(),
       ),
     );
     gh.factory<_i955.SymptomRegistrationBloc>(

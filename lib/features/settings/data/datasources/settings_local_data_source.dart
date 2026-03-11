@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:scheck/features/settings/domain/entities/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +11,7 @@ class SettingsLocalDataSource {
   Future<AppSettings> getSettings() async {
     final prefs = await SharedPreferences.getInstance();
     final locale = prefs.getString(_localeKey) ?? 'en';
-    final color = prefs.getInt(_colorKey) ?? 0xFFFFA500;
+    final color = prefs.getInt(_colorKey) ?? Colors.deepPurple.toARGB32();
     return AppSettings(locale: locale, primaryColor: color);
   }
 

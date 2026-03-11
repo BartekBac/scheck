@@ -38,7 +38,16 @@ class SettingsPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
-                    children: [Colors.indigo, Colors.deepPurple, Colors.teal, Colors.amber, Colors.blueAccent, Colors.blueGrey, Colors.green, Colors.lime].map((color) {
+                    children: [
+                      Colors.deepPurple,
+                      Colors.indigo,
+                      Colors.teal,
+                      Colors.amber,
+                      Colors.blueAccent,
+                      Colors.blueGrey,
+                      Colors.green,
+                      Colors.lime
+                    ].map((color) {
                       return GestureDetector(
                         onTap: () {
                           context.read<SettingsBloc>().add(SettingsEvent.changePrimaryColor(color.value));
@@ -61,6 +70,7 @@ class SettingsPage extends StatelessWidget {
                     items: [
                       DropdownMenuItem(value: 'en', child: Text(l10n.languageEnglish)),
                       DropdownMenuItem(value: 'es', child: Text(l10n.languageSpanish)),
+                      DropdownMenuItem(value: 'pl', child: Text(l10n.languagePolish)),
                     ],
                     onChanged: (locale) {
                       if (locale != null) {

@@ -26,7 +26,8 @@ class App extends StatelessWidget {
           return MaterialApp(
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(
-                seedColor: state.settings != null ? Color(state.settings!.primaryColor) : Colors.indigo,
+                seedColor: state.settings != null ? Color(state.settings!.primaryColor) : Colors.deepPurple,
+                //brightness: Brightness.dark
               ),
               useMaterial3: true,
             ),

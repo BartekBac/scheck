@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:scheck/core/entities/entry.dart';
 import 'package:scheck/core/entities/symptom.dart';
+import 'package:scheck/core/enums/meal_type.dart';
+import 'package:scheck/core/enums/mood.dart';
 import 'package:scheck/core/stylers/color_styler.dart';
 import 'package:scheck/core/stylers/shape_styler.dart';
 import 'package:scheck/core/stylers/text_styler.dart';
@@ -140,13 +142,13 @@ class _EntryCardState extends State<EntryCard> {
               Text(l10n.detailsDialogIntensitiesLabel(entry.symptomIntensities.toString())),
             ],
             if (entry is MealEntry) ...[
-              Text(l10n.detailsDialogMealLabel(entry.mealType.label)),
+              Text(l10n.detailsDialogMealLabel(entry.mealType.getLabel(context))),
               Text(l10n.detailsDialogImageLabel(entry.localImageUrl ?? entry.remoteImageUrl ?? context.l10n.detailsDialogNoImage)),
               Row(
                 children: [
                   Text(l10n.detailsDialogMoodLabel),
                   Icon(entry.moodBeforeMeal?.icon ?? IconFacade.empty, size: 20),
-                  Text(entry.moodBeforeMeal?.label ?? l10n.generalNotAvailable),
+                  Text(entry.moodBeforeMeal?.getLabel(context) ?? l10n.generalNotAvailable),
                 ],
               ),
               Text(l10n.detailsDialogIngredientsLabel(entry.ingredients.join(", "))),
@@ -286,7 +288,7 @@ class _EntryCardState extends State<EntryCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoRow(label: l10n.titleMealType, value: Text(mealEntry.mealType.label)),
+        _buildInfoRow(label: l10n.titleMealType, value: Text(mealEntry.mealType.getLabel(context))),
         _buildMealImage(mealEntry),
         const SizedBox(height: 8),
         if (mealEntry.ingredients.isNotEmpty) ...[
@@ -309,7 +311,7 @@ class _EntryCardState extends State<EntryCard> {
             ),
             const SizedBox(width: 4),
             Text(
-              mood.label,
+              mood.getLabel(context),
               style: TextStyler.Body.medium(context).copyWith(color: mood.getColor(context)),
             ),
           ],

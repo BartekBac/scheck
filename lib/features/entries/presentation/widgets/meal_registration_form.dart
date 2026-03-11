@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:scheck/core/entities/entry.dart';
+import 'package:scheck/core/enums/meal_type.dart';
+import 'package:scheck/core/enums/mood.dart';
 import 'package:scheck/core/stylers/color_styler.dart';
 import 'package:scheck/core/stylers/shape_styler.dart';
 import 'package:scheck/core/stylers/text_styler.dart';
@@ -100,7 +101,7 @@ class MealRegistrationForm extends StatelessWidget {
                     icon: Icon(IconFacade.aiWand),
                     color: ColorStyler.Primary.color(context),
                     onPressed: () async {
-                      context.read<MealRegistrationBloc>().add(AnalyzeMealImage(state.image!));
+                      context.read<MealRegistrationBloc>().add(AnalyzeMealImage(state.image!, l10n.localeName));
                     },
                   ),
                 IconButton(
@@ -174,7 +175,7 @@ class MealRegistrationForm extends StatelessWidget {
           runSpacing: 8,
           children: MealType.values.map((type) {
             return ChoiceChip(
-              label: Text(type.label),
+              label: Text(type.getLabel(context)),
               showCheckmark: false,
               selected: state.mealType == type,
               onSelected: (selected) {

@@ -1,6 +1,6 @@
 {
     "@@locale": "es",
-    "appTitle": "Meal Feel",
+    "appTitle": "Meel",
     "greet1": "Bienvenido",
     "greet2": "Hola",
     "greet3": "Buenos días",
@@ -57,8 +57,23 @@
     "symptomSkinRash": "Erupción cutánea",
     "symptomAnxiety": "Ansiedad",
     "symptomBrainFog": "Niebla mental",
+
+    "mealTypeBreakfast": "Desayuno",
+    "mealTypeLunch": "Almuerzo",
+    "mealTypeDinner": "Cena",
+    "mealTypeSnack": "Merienda",
+    "mealTypeSupper": "Tentempié",
+    "mealTypeOther": "Otro",
+
+    "moodGreat": "Genial",
+    "moodGood": "Bien",
+    "moodNeutral": "Neutral",
+    "moodBad": "Mal",
+    "moodTerrible": "Fatal",
+
     "languageEnglish": "Inglés",
     "languageSpanish": "Español",
+    "languagePolish": "Polaco",
     "detailsDialogIdLabel": "Id: {id}",
     "detailsDialogSymptomsLabel": "Síntomas: {symptoms}",
     "detailsDialogIntensitiesLabel": "Intensidades: {intensities}",

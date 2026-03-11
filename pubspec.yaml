@@ -1,5 +1,5 @@
 name: scheck
-description: Self-Check app for a better life!
+description: Your AI-Powered Nutrition & Symptom Tracker
 version: 1.0.0+1
 publish_to: none
 
@@ -32,6 +32,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.41
   supabase_flutter: ^2.8.3
   flutter_image_compress: ^2.4.0
+  translator: ^1.0.4+1
 
 dev_dependencies:
   flutter_test:

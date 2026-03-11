@@ -7,6 +7,6 @@ part 'settings.freezed.dart';
 sealed class AppSettings with _$AppSettings {
   const factory AppSettings({
     @Default('en') String locale,
-    @Default(0xFF3F51B5) int primaryColor, // Default to Colors.indigo
+    @Default(0xFF673AB7) int primaryColor, // Default to Colors.deepPurple[800]
   }) = _AppSettings;
 }
